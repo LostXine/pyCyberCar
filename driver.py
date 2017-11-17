@@ -44,19 +44,19 @@ class controller:
 
     def __setServo(self, ratio):
         # normalize ratio to [-1, 1]
-        s = min(max(float(ratio), -1), 1)
+        s = -min(max(float(ratio), -1), 1)
         mid = self.__const['servo_mid']
         dc = mid
         if s < 0:
-            dc = mid + (mid - self.__const['servo_left']) * s
+            dc = mid + (mid - self.__const['servo_right']) * s
         else:
-            dc = mid + (self.__const['servo_right'] - mid) * s
+            dc = mid + (self.__const['servo_left'] - mid) * s
         # set servo
         self.__servop.ChangeDutyCycle(dc)
     
     def __setMotor(self, speed):
         forward = (speed >= 0)
-        s = min(max(float(abs(speed)), self.__const['motor_min']), self.__const['motor_max'])
+        s = min(max(float(abs(speed)), 0), self.__const['motor_max'])
         if forward:
             self.__motorb.ChangeDutyCycle(0)
             self.__motorf.ChangeDutyCycle(s)
@@ -93,6 +93,7 @@ class driver:
     __const = None
     __sock = None
     __dst = None
+    changed = False
 
     def __init__(self):
         print "----------Driver No.%d Init----------" % id(self)
@@ -103,18 +104,37 @@ class driver:
 
             self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         finally:
-            print "----------Driver Init Failed----------"
+            print "\n----------Driver Init Failed----------"
         print "----------Driver Init Done----------"
 
     def __del__(self):
-        print "----------Driver No.%d End----------" % id(self)
+        print "\n----------Driver No.%d End----------" % id(self)
 
-    def reset(self):
+    def launch(self):
         if self.__sock is not None:
             self.__sock.sendto(json.dumps(self.__conf), self.__dst)
+            self.changed = False
         else:
             print "Driver's sock is empty."
+    
+    def setMotor(self, motor):
+        # motor: from -100 to 100
+        self.changed = True
+        self.__conf['motor'] = motor
+    
+    def setSpeed(self, speed, forward=1):
+        # speed level depends on motor_level
+        num = len(self.__const['motor_level'])
+        sp = max(min(num-1, int(speed)), 0)
+        sp = self.__const['motor_level'][sp]
+        if not forward:
+            sp = -sp
+        self.setMotor(sp)
 
+    def setServo(self, steer):
+        # steer: from -1 to 1
+        self.changed = True
+        self.__conf['servo'] = steer
         
 
 if __name__=='__main__':
