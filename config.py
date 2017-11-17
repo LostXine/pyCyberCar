@@ -13,7 +13,7 @@ def getDefaultConst():
 
             'servo_pin': 21,
             'servo_left': 65.0,
-            'servo_mid': 50,
+            'servo_mid': 48,
             'servo_right': 35.0,
             'servo_feq': 300
             }

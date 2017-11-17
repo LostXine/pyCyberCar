@@ -56,8 +56,8 @@ def parse_nrf(info, driver):
         # -0.5 -- 0.5
         if abs(motor_value) < 0.1:
             motor_value = 0
-        driver.setMotor(motor_mask * motor_value)
-        servo_value = (float(parse_num(info[8:10]))/1024 - 0.5) * 2
+        driver.setMotor(motor_mask * motor_value * 6)
+        servo_value = (float(parse_num(info[8:10]))/1024 - 0.5) * 2 
         driver.setServo(servo_value)
         driver.launch()
     except Exception, e:
@@ -96,7 +96,7 @@ def run_nrf24():
             radio.read(recv_buffer)
             byteNum += len(recv_buffer)
             ct += 1
-            if ct > 5:
+            if ct > 1:
                 ct = 0
                 parse_nrf(recv_buffer, d)
     except KeyboardInterrupt:

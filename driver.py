@@ -55,8 +55,9 @@ class controller:
         self.__servop.ChangeDutyCycle(dc)
     
     def __setMotor(self, speed):
+        # print speed
         forward = (speed >= 0)
-        s = min(max(float(abs(speed)), 0), self.__const['motor_max'])
+        s = min(max(float(abs(speed)), 0), self.__const['motor_max']) * 100
         if forward:
             self.__motorb.ChangeDutyCycle(0)
             self.__motorf.ChangeDutyCycle(s)
