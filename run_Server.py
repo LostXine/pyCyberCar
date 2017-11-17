@@ -14,18 +14,24 @@ def run_server():
         # listening udp
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(('127.0.0.1', const['port']))
+        print "Listenning port:%d" % const['port']
     except Exception, e:
         print repr(e)
         print "----------Server Init Failed----------"
         return 1
     print "----------Server Init Done----------"
     try:
+        sender = None
         while True:
             res = sock.recvfrom(1024)
-            print "recv: %s, from: %s" % res
+            # print "recv: %s, from: %s" % res
+            if sender != res[1]:
+                sender = res[1]
+                print "Sender changed to: %s:%d" % res[1]
     except KeyboardInterrupt:
         return 0
     except Exception, e:
+        print repr(e)
         return 2
     finally:
         sock.close()

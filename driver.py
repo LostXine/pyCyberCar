@@ -11,7 +11,7 @@ class driver:
     __dst = None
 
     def __init__(self):
-        print "----------Driver Init----------"
+        print "----------Driver No.%d Init----------" % id(self)
         try: 
             self.__const = getDefaultConst()
             self.__conf = getDefaultConfig()
@@ -23,7 +23,7 @@ class driver:
         print "----------Driver Init Done----------"
 
     def __del__(self):
-        print "----------Driver End----------"
+        print "----------Driver No.%d End----------" % id(self)
 
     def launch(self):
         self.__sock.sendto(json.dumps(self.__conf), self.__dst)
