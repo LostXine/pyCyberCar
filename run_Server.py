@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from config import *
+from driver import controller
 import socket, json
 
 
@@ -11,6 +12,8 @@ def run_server():
         # load config
         const = getDefaultConst()
         conf = getDefaultConfig()
+        # setup controller
+        c = controller()
         # listening udp
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(('127.0.0.1', const['port']))
@@ -28,6 +31,8 @@ def run_server():
             if sender != res[1]:
                 sender = res[1]
                 print "Sender changed to: %s:%d" % res[1]
+            if c.parse(res[0]):
+                print "Unknown cmd: %s" % res[0]
     except KeyboardInterrupt:
         return 0
     except Exception, e:
@@ -35,6 +40,7 @@ def run_server():
         return 2
     finally:
         sock.close()
+        del c
         print "\n----------Server End----------"
 
 if __name__=='__main__':
