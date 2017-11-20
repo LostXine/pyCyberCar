@@ -7,7 +7,7 @@ def getDefaultConst():
 
             'motor_fpin': 16,
             'motor_bpin': 20,
-            'motor_level': [0.0, 70, 80, 90, 100],
+            'motor_level': [0, 70, 80, 90, 95, 100],
             'motor_max': 100.0,
             'motor_feq': 200,
 

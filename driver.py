@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from config import *
-import socket, json, time, atexit
+import socket, json, time , atexit
 import RPi.GPIO as GPIO
 
 class controller:
@@ -57,7 +57,7 @@ class controller:
     def __setMotor(self, speed):
         # print speed
         forward = (speed >= 0)
-        s = min(max(float(abs(speed)), 0), self.__const['motor_max']) * 100
+        s = min(max(float(abs(speed * 100)), 0), self.__const['motor_max']) 
         if forward:
             self.__motorb.ChangeDutyCycle(0)
             self.__motorf.ChangeDutyCycle(s)
@@ -104,8 +104,10 @@ class driver:
             self.__dst = ('127.0.0.1', self.__const['port'])
 
             self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        finally:
-            print "\n----------Driver Init Failed----------"
+        except Exception, e :
+            print repr(e)
+            print "----------Driver Init Failed----------"
+            return
         print "----------Driver Init Done----------"
 
     def __del__(self):
@@ -119,7 +121,7 @@ class driver:
             print "Driver's sock is empty."
     
     def setMotor(self, motor):
-        # motor: from -100 to 100
+        # motor: from -1 to 1
         self.changed = True
         self.__conf['motor'] = motor
     

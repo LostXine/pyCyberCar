@@ -51,12 +51,11 @@ def parse_nrf(info, driver):
         #        tuple(info[2:10])
         #print "Mask: %d, Thro: %d, STEER: %d" \
         #       % (parse_num(info[2:4]), parse_num(info[6:8]), parse_num(info[8:10]))
-        motor_mask = float(parse_num(info[2:4]))/1024
-        motor_value = float(parse_num(info[6:8]))/1024 - 0.5
-        # -0.5 -- 0.5
-        if abs(motor_value) < 0.1:
+        motor_value = float(parse_num(info[2:4]))/1024
+        # 0.0 - 1.0
+        if abs(motor_value) < 0.2:
             motor_value = 0
-        driver.setMotor(motor_mask * motor_value * 6)
+        driver.setMotor(motor_value * 2)
         servo_value = (float(parse_num(info[8:10]))/1024 - 0.5) * 2 
         driver.setServo(servo_value)
         driver.launch()
