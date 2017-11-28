@@ -95,8 +95,6 @@ class controller:
     def emergency(self):
         self.__motorf.ChangeDutyCycle(0)
         self.__motorb.ChangeDutyCycle(0)
-        print time.strftime("[%H:%M:%S] DOGSTOP", time.localtime()) 
-
 
 
 class driver:

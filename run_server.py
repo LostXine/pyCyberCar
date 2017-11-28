@@ -9,15 +9,13 @@ import threading
 
 dt = 0
 
-def log(info):
-    pass
-
 def watchdog(c, const):
     global dt
     has_stop = False
     while True:
         if time.time() - dt > const['dog']:
             if not has_stop:
+                print time.strftime('%H:%M:%S STOP',time.localtime(time.time()))
                 c.emergency()
                 has_stop = True
         elif has_stop:
