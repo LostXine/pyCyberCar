@@ -20,7 +20,7 @@ def run_cybercar():
     try:
         for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
             # get timestamp
-            uid = int(time.time())
+            uid = time.time()
             # grab image for opencv
             image = frame.array
             # show image
@@ -44,7 +44,8 @@ def run_cybercar():
             # Servo control:
             # left - mid -right
             # -1.0 - 0.0 - 1.0
-            d.setStatus(uid, motor=0.0, servo=0.0)
+            if d.setStatus(uid, motor=0.0, servo=0.0):
+                print "setStatus() failed."
 
         return 0
     except KeyboardInterrupt:
