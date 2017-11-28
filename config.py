@@ -22,7 +22,7 @@ def getDefaultConst():
 
 def getDefaultConfig():
     config = {
-            'uid': 0,
+            'uid': 0.0,
             'motor': 0.0,
             'servo' : 0.0
             }

@@ -3,14 +3,14 @@
 
 from config import *
 from driver import controller
-import socket, json, sys, time
+import socket, json, sys, time, datetime
 import threading
 
 
 dt = 0
 
 def server_log(info):
-    print "%s %s" % (time.strftime('%H:%M:%S', time.localtime(time.time())), info)
+    print "%s %s" % (datetime.datetime.now().strftime('%M:%S.%f'), info)
 
 def watchdog(c, const):
     global dt
@@ -38,9 +38,10 @@ def run_server():
 
     # check debug mode
     debug = False
-    if len(sys.argv) > 1 and sys.argv[1] == '-d':
-        print "**********DEBUG MODE**********"
-        debug = True
+    for i in sys.argv:
+        if i == '-d':
+            print "**********DEBUG MODE**********"
+            debug = True
 
     try:
         # load config
@@ -67,12 +68,12 @@ def run_server():
         while True:
             res = sock.recvfrom(1024)
             if debug:
-                server_log("recv: %s, from: %s" % (res[0], res[1][0], res[1][1]))
+                server_log("recv: %s, from: %s:%d" % (res[0], res[1][0], res[1][1]))
             if sender != res[1]:
                 sender = res[1]
                 server_log("Sender changed to: %s:%d" % res[1])
             if c.parse(res[0]):
-                server_log("Unknown cmd: %s" % res[0])
+                server_log("Error cmd: %s" % res[0])
             else:
                 # feed the watchdog
                 dt = time.time()

@@ -6,7 +6,6 @@
 
 from nrf24 import NRF24
 import time
-from time import gmtime, strftime
 import threading, sys
 from driver import driver
 

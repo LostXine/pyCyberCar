@@ -76,10 +76,10 @@ class controller:
                 print "Uid is needed."
                 return 2
             elif self.__conf['uid'] > obj['uid']:
-                print "uid %d is behind %d, drop %s" % (obj['uid'], self.__conf['uid'], js)
+                print "uid %0.3f is behind %0.3f, drop %s" % (obj['uid'], self.__conf['uid'], js)
                 return 3
             else:
-                self.__conf['uid'] = obj['uid']
+                self.__conf['uid'] = float(obj['uid'])
             if obj.has_key('servo'):
                 self.__setServo(obj['servo'])
             if obj.has_key('motor'):
@@ -126,7 +126,7 @@ class driver:
     
     def __setMotor(self, motor):
         # motor: from -1 to 1
-        self.__conf['motor'] = max(min(motor, 1), -1)
+        self.__conf['motor'] = round(max(min(motor, 1), -1), 3)
     
     def __setSpeed(self, speed, forward=1):
         # speed level depends on motor_level
@@ -139,11 +139,11 @@ class driver:
 
     def __setServo(self, steer):
         # steer: from -1 to 1
-        self.__conf['servo'] = max(min(steer, 1), -1)
+        self.__conf['servo'] = round(max(min(steer, 1), -1), 3)
 
     def setStatus(self,uid , **dt):
         if self.__mutex.acquire(1):
-            self.__conf['uid'] = int(uid)
+            self.__conf['uid'] = round(uid, 3)
             if dt.has_key('speed'):
                 self.__setSpeed(dt['speed'])
             if dt.has_key('motor'):
