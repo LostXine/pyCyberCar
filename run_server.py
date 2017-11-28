@@ -9,13 +9,16 @@ import threading
 
 dt = 0
 
+def server_log(info):
+    print "%s %s" % (time.strftime('%H:%M:%S', time.localtime(time.time())), info)
+
 def watchdog(c, const):
     global dt
     has_stop = False
     while True:
         if time.time() - dt > const['dog']:
             if not has_stop:
-                print time.strftime('%H:%M:%S STOP',time.localtime(time.time()))
+                server_log('STOP')
                 c.emergency()
                 has_stop = True
         elif has_stop:
@@ -64,12 +67,12 @@ def run_server():
         while True:
             res = sock.recvfrom(1024)
             if debug:
-                print "recv: %s, from: %s" % res
+                server_log("recv: %s, from: %s" % (res[0], res[1][0], res[1][1]))
             if sender != res[1]:
                 sender = res[1]
-                print "Sender changed to: %s:%d" % res[1]
+                server_log("Sender changed to: %s:%d" % res[1])
             if c.parse(res[0]):
-                print "Unknown cmd: %s" % res[0]
+                server_log("Unknown cmd: %s" % res[0])
             else:
                 # feed the watchdog
                 dt = time.time()
