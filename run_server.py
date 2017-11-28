@@ -3,11 +3,16 @@
 
 from config import *
 from driver import controller
-import socket, json
+import socket, json, sys
 
 
 def run_server():
     print "----------Server Init----------"
+    debug = False
+    if len(sys.argv) > 1 and sys.argv[1] == '-d':
+
+        print "**********DEBUG MODE**********"
+        debug = True
     try:
         # load config
         const = getDefaultConst()
@@ -27,7 +32,8 @@ def run_server():
         sender = None
         while True:
             res = sock.recvfrom(1024)
-            # print "recv: %s, from: %s" % res
+            if debug:
+                print "recv: %s, from: %s" % res
             if sender != res[1]:
                 sender = res[1]
                 print "Sender changed to: %s:%d" % res[1]

@@ -40,6 +40,7 @@ class controller:
     def __del__(self):
         self.__motorb.stop()
         self.__motorf.stop()
+        self.__setServo(0)
         self.__servop.stop()
         print "Controller End"
 
