@@ -55,10 +55,8 @@ def parse_nrf(info, driver):
         # 0.0 - 1.0
         if abs(motor_value) < 0.2:
             motor_value = 0
-        driver.setMotor(motor_value * 2)
         servo_value = (float(parse_num(info[8:10]))/1024 - 0.5) * 2 
-        driver.setServo(servo_value)
-        driver.launch()
+        driver.setStatus(time.time(), servo=servo_value, motor=motor_value)
     except Exception, e:
         print repr(e)
         return 1

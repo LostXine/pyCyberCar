@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from config import *
+import threading
 import socket, json, time , atexit
 import RPi.GPIO as GPIO
 
@@ -70,6 +71,14 @@ class controller:
         try:
             obj = json.loads(js)
             # parse servo
+            if not obj.has_key('uid'):
+                print "Uid is needed."
+                return 2
+            elif self.__conf['uid'] > obj['uid']:
+                print "uid %d is behind %d, drop %s" % (obj['uid'], self.__conf['uid'], js)
+                return 3
+            else:
+                self.__conf['uid'] = obj['uid']
             if obj.has_key('servo'):
                 self.__setServo(obj['servo'])
             if obj.has_key('motor'):
@@ -94,8 +103,8 @@ class driver:
     __const = None
     __sock = None
     __dst = None
-    changed = False
-
+    __mutex = threading.Lock()
+    
     def __init__(self):
         print "----------Driver No.%d Init----------" % id(self)
         try: 
@@ -113,31 +122,40 @@ class driver:
     def __del__(self):
         print "\n----------Driver No.%d End----------" % id(self)
 
-    def launch(self):
-        if self.__sock is not None:
-            self.__sock.sendto(json.dumps(self.__conf), self.__dst)
-            self.changed = False
-        else:
-            print "Driver's sock is empty."
+    def __launch(self):
+        self.__sock.sendto(json.dumps(self.__conf), self.__dst)
     
-    def setMotor(self, motor):
+    def __setMotor(self, motor):
         # motor: from -1 to 1
-        self.changed = True
-        self.__conf['motor'] = motor
+        self.__conf['motor'] = max(min(motor, 1), -1)
     
-    def setSpeed(self, speed, forward=1):
+    def __setSpeed(self, speed, forward=1):
         # speed level depends on motor_level
         num = len(self.__const['motor_level'])
         sp = max(min(num-1, int(speed)), 0)
         sp = self.__const['motor_level'][sp]
         if not forward:
             sp = -sp
-        self.setMotor(sp)
+        self.__setMotor(sp)
 
-    def setServo(self, steer):
+    def __setServo(self, steer):
         # steer: from -1 to 1
-        self.changed = True
-        self.__conf['servo'] = steer
+        self.__conf['servo'] = max(min(steer, 1), -1)
+
+    def setStatus(self,uid , **dt):
+        if self.__mutex.acquire(1):
+            self.__conf['uid'] = int(uid)
+            if dt.has_key('speed'):
+                self.__setSpeed(dt['speed'])
+            if dt.has_key('motor'):
+                self.__setMotor(dt['motor'])
+            if dt.has_key('servo'):
+                self.__setServo(dt['servo'])
+            self.__launch()
+            self.__mutex.release()
+            return 0
+        else:
+            return 1
         
 
 if __name__=='__main__':

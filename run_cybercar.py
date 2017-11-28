@@ -19,6 +19,8 @@ def run_cybercar():
     d = driver()
     try:
         for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
+            # get timestamp
+            uid = int(time.time())
             # grab image for opencv
             image = frame.array
             # show image
@@ -33,24 +35,16 @@ def run_cybercar():
 
             # how to control the car:
 
-            # (1/2) set motor / steering
+            # set uid + set motor / steering
 
             # Motor control:
             # forward  0 -> 1.0
             # backward 0 -> -1.0
-            d.setMotor(0.0)
-            # or
-            # speed: 0-5
-            # direction: forward=1 or 0
-            d.setSpeed(0, forward=0)
-
+            
             # Servo control:
             # left - mid -right
             # -1.0 - 0.0 - 1.0
-            d.setServo(0.0)
-
-            # (2/2) IMPORTANT! launch the command
-            d.launch()
+            d.setStatus(uid, motor=0.0, servo=0.0)
 
         return 0
     except KeyboardInterrupt:

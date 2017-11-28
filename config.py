@@ -7,8 +7,8 @@ def getDefaultConst():
 
             'motor_fpin': 16,
             'motor_bpin': 20,
-            'motor_level': [0, 70, 80, 90, 95, 100],
-            'motor_max': 100.0,
+            'motor_level': [0, 0.7, 0.8, 0.9, 0.95, 1.0],
+            'motor_max': 1.0,
             'motor_feq': 200,
 
             'servo_pin': 21,
@@ -21,6 +21,7 @@ def getDefaultConst():
 
 def getDefaultConfig():
     config = {
+            'uid': 0,
             'motor': 0.0,
             'servo' : 0.0
             }
