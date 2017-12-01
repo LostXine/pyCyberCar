@@ -5,7 +5,6 @@ from driver import driver
 from image_process import *
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-import time
 import cv2
 
 def run_cybercar():
@@ -13,7 +12,7 @@ def run_cybercar():
     # init picamera
     c = PiCamera()
     c.resolution = (640, 480)
-    c.framerate = 25
+    c.framerate = 30
     # prepare memery
     raw = PiRGBArray(c, c.resolution)
     # init car driver

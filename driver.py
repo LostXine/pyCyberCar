@@ -33,8 +33,10 @@ class controller:
             self.__motorb.start(0)
             self.__motorf.start(0)
             self.__servop.start(self.__const['servo_mid'])
-        finally:
+        except Exception, e:
+            print repr(e)
             print "Controller Init Error"
+            return 
         print "Controller Init Done"
 
     def __del__(self):

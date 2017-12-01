@@ -3,7 +3,7 @@
 
 from config import *
 from driver import driver
-import cv2
+import cv2, time
 
 class dip:
     __car = None
