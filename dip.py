@@ -34,6 +34,8 @@ class dip:
         
 
     def gui(self, res):
+        if res is None:
+            return 0 
         # show image
         cv2.imshow("Frame", res['image'])
         # waitkey

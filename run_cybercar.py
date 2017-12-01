@@ -40,7 +40,7 @@ def run_cybercar():
     try:
         for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
             image = frame.array
-            res = 0
+            res = None
             if mp:
                 if len(result) >= const['processor']:
                     res = result[0].get()
