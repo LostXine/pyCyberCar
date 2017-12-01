@@ -26,10 +26,13 @@ def run_cybercar():
 
     # check multiprocess mode
     mp = False
+    fps = False
     for i in sys.argv:
-        if i == '-mp':
+        if i == '-mp' or i == '-m':
             print "**********MULTI MODE**********"
             mp = True
+        if i == '-fps' or i == '-f':
+            fps = True
     # init car driver
     global d
     d = dip()
@@ -38,8 +41,9 @@ def run_cybercar():
         pool = multiprocessing.Pool(processes=const['processor'])
         result = []
     # setup fps counter
-    c_frame = 0
-    c_time = [time.time()]
+    if fps:
+        c_frame = 0
+        c_time = [time.time()]
     try:
         for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
             image = frame.array 
@@ -51,15 +55,20 @@ def run_cybercar():
                 result.append(pool.apply_async(frame_loop, [image]))
             else:
                 res = frame_loop(image)
-            # calculate fps
-            c_time.append(time.time())
-            if c_frame < 10:
-                c_frame += 1
-            else:
-                del c_time[0]
-            fps = c_frame/ (c_time[-1] - c_time[0])
-            if res: 
-                res['fps'] = fps
+            if fps:
+                # calculate fps
+                c_time.append(time.time())
+                if c_frame < 10:
+                    c_frame += 1
+                else:
+                    del c_time[0]
+                c_fps = c_frame/ (c_time[-1] - c_time[0])
+                f = sys.stdout
+                f.write("Current fps: %.2f" % c_fps)
+                f.flush()
+                f.write('\r')
+                if res: 
+                    res['fps'] = c_fps
             # draw results
             if d.gui(res):
                 break

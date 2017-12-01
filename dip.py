@@ -39,7 +39,7 @@ class dip:
         if res.has_key('image'):
             img = res['image']
             if res.has_key('fps'):
-                cv2.putText(img, "FPS: " + str(round(res['fps'],1)), (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                cv2.putText(img, "FPS: " + str(round(res['fps'],2)), (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # show image
             cv2.imshow("Frame", img)
             # waitkey
