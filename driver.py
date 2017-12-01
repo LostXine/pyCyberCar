@@ -5,6 +5,8 @@ from config import *
 import threading
 import socket, json, time , atexit
 import RPi.GPIO as GPIO
+import traceback
+
 
 class controller:
     __conf = None
@@ -33,8 +35,8 @@ class controller:
             self.__motorb.start(0)
             self.__motorf.start(0)
             self.__servop.start(self.__const['servo_mid'])
-        except Exception, e:
-            print repr(e)
+        except:
+            traceback.print_exc() 
             print "Controller Init Error"
             return 
         print "Controller Init Done"
@@ -87,8 +89,8 @@ class controller:
             if obj.has_key('motor'):
                 self.__setMotor(obj['motor'])
             return 0
-        except Exception, e:
-            print repr(e)
+        except:
+            traceback.print_exc() 
             return 1
 
     def reset(self):
@@ -114,8 +116,8 @@ class driver:
             self.__dst = ('127.0.0.1', self.__const['port'])
 
             self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        except Exception, e :
-            print repr(e)
+        except:
+            traceback.print_exc() 
             print "----------Driver Init Failed----------"
             return
         print "----------Driver Init Done----------"

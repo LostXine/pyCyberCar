@@ -5,6 +5,7 @@ from config import *
 from driver import controller
 import socket, json, sys, time, datetime
 import threading
+import traceback
 
 
 dt = 0
@@ -53,8 +54,8 @@ def run_server():
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(('127.0.0.1', const['port']))
         print "Listenning port:%d" % const['port']
-    except Exception, e:
-        print repr(e)
+    except:
+        traceback.print_exc() 
         print "----------Server Init Failed----------"
         return 1
     print "----------Server Init Done----------"
@@ -79,8 +80,8 @@ def run_server():
                 dt = time.time()
     except KeyboardInterrupt:
         return 0
-    except Exception, e:
-        print repr(e)
+    except : 
+        traceback.print_exc() 
         return 2
     finally:
         del t
