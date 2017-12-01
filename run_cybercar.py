@@ -3,10 +3,16 @@
 
 from config import *
 from driver import driver
-from image_process import *
+from dip import *
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-import cv2, multiprocessing
+import cv2, sys, multiprocessing
+
+d = None
+
+def frame_loop(image):
+    global d
+    return d.process_image(image)
 
 def run_cybercar():
     print "==========CyberCar Start=========="
@@ -25,6 +31,7 @@ def run_cybercar():
             print "**********MULTI MODE**********"
             mp = True
     # init car driver
+    global d
     d = dip()
     # set process pool
     if mp:
@@ -33,22 +40,20 @@ def run_cybercar():
     try:
         for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
             image = frame.array
+            res = 0
             if mp:
                 if len(result) >= const['processor']:
                     res = result[0].get()
                     del result[0]
-                result.append(pool.apply_async(d.process_image, (d, image, )))
+                result.append(pool.apply_async(frame_loop, [image]))
             else:
-                res = d.process_image(image)
+                res = frame_loop(image)
             if res:
                 break
             # reset
             raw.truncate(0)
     except KeyboardInterrupt:
         pass
-    except Exception, e:
-        print repr(e)
-        return 1
     if mp:
         pool.close()
         pool.join()

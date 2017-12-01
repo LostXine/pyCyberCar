@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import multiprocessing as mp
+
 def getDefaultConst():
     const = {
             'port': 61551,
             'dog': 3,
-            'processor': 4,
 
             'motor_fpin': 16,
             'motor_bpin': 20,
@@ -19,6 +20,7 @@ def getDefaultConst():
             'servo_right': 35.0,
             'servo_feq': 300
             }
+    const['processor'] = mp.cpu_count()
     return const
 
 def getDefaultConfig():

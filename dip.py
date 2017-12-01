@@ -7,7 +7,7 @@ import cv2, time
 
 class dip:
     __car = None
-
+    
     def process_image(self, image):
         # get timestamp do not change
         uid = time.time()
