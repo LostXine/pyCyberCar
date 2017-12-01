@@ -83,5 +83,7 @@ def run_cybercar():
                
     
 if __name__ == '__main__':
+    print "Usage: python runcybercar.py [-f] [-mp]"
+    print "-f : show fps\n-mp: use multi-processing"
     run_cybercar()
 
