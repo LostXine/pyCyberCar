@@ -29,13 +29,11 @@ class dip:
         if self.__car.setStatus(uid, motor=0.0, servo=0.0):
             print "setStatus() failed."
         # return something to gui function
-        res = {'image': image}
+        res = {}
         return res
         
 
     def gui(self, res):
-        if res is None:
-            return 0
         if res.has_key('image'):
             img = res['image']
             if res.has_key('fps'):

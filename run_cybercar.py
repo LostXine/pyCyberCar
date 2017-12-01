@@ -20,7 +20,7 @@ def run_cybercar():
     # init picamera
     c = PiCamera()
     c.resolution = (640, 480)
-    c.framerate = 30
+    c.framerate = 20 
     # prepare memery
     raw = PiRGBArray(c, c.resolution)
 
@@ -47,7 +47,7 @@ def run_cybercar():
     try:
         for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
             image = frame.array 
-            res = None
+            res = {}
             if mp:
                 if len(result) >= const['processor']:
                     res = result[0].get()
@@ -58,7 +58,7 @@ def run_cybercar():
             if fps:
                 # calculate fps
                 c_time.append(time.time())
-                if c_frame < 10:
+                if c_frame < 20:
                     c_frame += 1
                 else:
                     del c_time[0]
@@ -67,8 +67,9 @@ def run_cybercar():
                 f.write("Current fps: %.2f" % c_fps)
                 f.flush()
                 f.write('\r')
-                if res: 
-                    res['fps'] = c_fps
+                res['fps'] = c_fps
+            
+            res['image'] = image
             # draw results
             if d.gui(res):
                 break
