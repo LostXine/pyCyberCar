@@ -6,9 +6,9 @@
 
 from nrf24 import NRF24
 import time
-from time import gmtime, strftime
 import threading, sys
 from driver import driver
+import traceback
 
 byteNum = 0
 
@@ -56,9 +56,9 @@ def parse_nrf(info, driver):
         if abs(motor_value) < 0.2:
             motor_value = 0
         servo_value = (float(parse_num(info[8:10]))/1024 - 0.5) * 2 
-        driver.setStatus(time.time(), servo=servo_value, motor=motor_value)
-    except Exception, e:
-        print repr(e)
+        driver.setStatus(time.time(), servo=servo_value, motor=motor_value /2)
+    except:
+        traceback.print_exc() 
         return 1
     else:
         return 0
@@ -98,8 +98,8 @@ def run_nrf24():
                 parse_nrf(recv_buffer, d)
     except KeyboardInterrupt:
         pass
-    except Exception, e:
-        print repr(e)
+    except:
+        traceback.print_exc()
         print "\n----------------NRF24 Interrupted-----------------"
     finally:
         radio.stopListening()

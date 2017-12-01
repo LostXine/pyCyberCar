@@ -5,6 +5,8 @@ from config import *
 import threading
 import socket, json, time , atexit
 import RPi.GPIO as GPIO
+import traceback
+
 
 class controller:
     __conf = None
@@ -33,8 +35,10 @@ class controller:
             self.__motorb.start(0)
             self.__motorf.start(0)
             self.__servop.start(self.__const['servo_mid'])
-        finally:
-            "Controller Init Error"
+        except:
+            traceback.print_exc() 
+            print "Controller Init Error"
+            return 
         print "Controller Init Done"
 
     def __del__(self):
@@ -59,7 +63,7 @@ class controller:
     def __setMotor(self, speed):
         # print speed
         forward = (speed >= 0)
-        s = min(max(float(abs(speed * 100)), 0), self.__const['motor_max']) 
+        s = min(max(float(abs(speed)), 0), self.__const['motor_max']) * 100
         if forward:
             self.__motorb.ChangeDutyCycle(0)
             self.__motorf.ChangeDutyCycle(s)
@@ -76,17 +80,17 @@ class controller:
                 print "Uid is needed."
                 return 2
             elif self.__conf['uid'] > obj['uid']:
-                print "uid %d is behind %d, drop %s" % (obj['uid'], self.__conf['uid'], js)
+                print "uid %0.3f is behind %0.3f, drop %s" % (obj['uid'], self.__conf['uid'], js)
                 return 3
             else:
-                self.__conf['uid'] = obj['uid']
+                self.__conf['uid'] = float(obj['uid'])
             if obj.has_key('servo'):
                 self.__setServo(obj['servo'])
             if obj.has_key('motor'):
                 self.__setMotor(obj['motor'])
             return 0
-        except Exception, e:
-            print repr(e)
+        except:
+            traceback.print_exc() 
             return 1
 
     def reset(self):
@@ -112,8 +116,8 @@ class driver:
             self.__dst = ('127.0.0.1', self.__const['port'])
 
             self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        except Exception, e :
-            print repr(e)
+        except:
+            traceback.print_exc() 
             print "----------Driver Init Failed----------"
             return
         print "----------Driver Init Done----------"
@@ -126,7 +130,7 @@ class driver:
     
     def __setMotor(self, motor):
         # motor: from -1 to 1
-        self.__conf['motor'] = max(min(motor, 1), -1)
+        self.__conf['motor'] = round(max(min(motor, 1), -1), 3)
     
     def __setSpeed(self, speed, forward=1):
         # speed level depends on motor_level
@@ -139,11 +143,11 @@ class driver:
 
     def __setServo(self, steer):
         # steer: from -1 to 1
-        self.__conf['servo'] = max(min(steer, 1), -1)
+        self.__conf['servo'] = round(max(min(steer, 1), -1), 3)
 
     def setStatus(self,uid , **dt):
         if self.__mutex.acquire(1):
-            self.__conf['uid'] = int(uid)
+            self.__conf['uid'] = round(uid, 3)
             if dt.has_key('speed'):
                 self.__setSpeed(dt['speed'])
             if dt.has_key('motor'):

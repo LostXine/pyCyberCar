@@ -3,11 +3,15 @@
 
 from config import *
 from driver import controller
-import socket, json, sys, time
+import socket, json, sys, time, datetime
 import threading
+import traceback
 
 
 dt = 0
+
+def server_log(info):
+    print "%s %s" % (datetime.datetime.now().strftime('%M:%S.%f'), info)
 
 def watchdog(c, const):
     global dt
@@ -15,7 +19,7 @@ def watchdog(c, const):
     while True:
         if time.time() - dt > const['dog']:
             if not has_stop:
-                print time.strftime('%H:%M:%S STOP',time.localtime(time.time()))
+                server_log('STOP')
                 c.emergency()
                 has_stop = True
         elif has_stop:
@@ -35,9 +39,10 @@ def run_server():
 
     # check debug mode
     debug = False
-    if len(sys.argv) > 1 and sys.argv[1] == '-d':
-        print "**********DEBUG MODE**********"
-        debug = True
+    for i in sys.argv:
+        if i == '-d':
+            print "**********DEBUG MODE**********"
+            debug = True
 
     try:
         # load config
@@ -49,8 +54,8 @@ def run_server():
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(('127.0.0.1', const['port']))
         print "Listenning port:%d" % const['port']
-    except Exception, e:
-        print repr(e)
+    except:
+        traceback.print_exc() 
         print "----------Server Init Failed----------"
         return 1
     print "----------Server Init Done----------"
@@ -64,19 +69,19 @@ def run_server():
         while True:
             res = sock.recvfrom(1024)
             if debug:
-                print "recv: %s, from: %s" % res
+                server_log("recv: %s, from: %s:%d" % (res[0], res[1][0], res[1][1]))
             if sender != res[1]:
                 sender = res[1]
-                print "Sender changed to: %s:%d" % res[1]
+                server_log("Sender changed to: %s:%d" % res[1])
             if c.parse(res[0]):
-                print "Unknown cmd: %s" % res[0]
+                server_log("Error cmd: %s" % res[0])
             else:
                 # feed the watchdog
                 dt = time.time()
     except KeyboardInterrupt:
         return 0
-    except Exception, e:
-        print repr(e)
+    except : 
+        traceback.print_exc() 
         return 2
     finally:
         del t
