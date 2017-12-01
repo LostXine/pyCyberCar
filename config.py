@@ -4,7 +4,8 @@
 def getDefaultConst():
     const = {
             'port': 61551,
-            'dog':3,
+            'dog': 3,
+            'processor': 4,
 
             'motor_fpin': 16,
             'motor_bpin': 20,
