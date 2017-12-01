@@ -13,10 +13,7 @@ class dip:
         uid = time.time()
         
         # --- image processing part --- 
-        # show image
-        cv2.imshow("Frame", image)
-        # waitkey
-        key = cv2.waitKey(10) & 0xff
+        # *******************
 
         # --- CyberCar controller part --- 
         # how to control the car:
@@ -31,8 +28,16 @@ class dip:
         # -1.0 - 0.0 - 1.0
         if self.__car.setStatus(uid, motor=0.0, servo=0.0):
             print "setStatus() failed."
+        # return something to gui function
+        res = {'image': image}
+        return res
+        
 
-        # --- returning part
+    def gui(self, res):
+        # show image
+        cv2.imshow("Frame", res['image'])
+        # waitkey
+        key = cv2.waitKey(10) & 0xff
         # return something not 0 to finish the code
         # check key
         if key == ord("q") or key == 27:

@@ -48,7 +48,7 @@ def run_cybercar():
                 result.append(pool.apply_async(frame_loop, [image]))
             else:
                 res = frame_loop(image)
-            if res:
+            if d.gui(res):
                 break
             # reset
             raw.truncate(0)
