@@ -6,7 +6,7 @@ from driver import driver
 from dip import *
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-import cv2, sys, multiprocessing
+import cv2, sys, multiprocessing, time
 
 d = None
 
@@ -37,17 +37,30 @@ def run_cybercar():
     if mp:
         pool = multiprocessing.Pool(processes=const['processor'])
         result = []
+    # setup fps counter
+    c_frame = 0
+    c_time = [time.time()]
     try:
         for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
-            image = frame.array
+            image = frame.array 
             res = None
             if mp:
                 if len(result) >= const['processor']:
                     res = result[0].get()
-                    del result[0]
+                    del result[0]                    
                 result.append(pool.apply_async(frame_loop, [image]))
             else:
                 res = frame_loop(image)
+            # calculate fps
+            c_time.append(time.time())
+            if c_frame < 10:
+                c_frame += 1
+            else:
+                del c_time[0]
+            fps = c_frame/ (c_time[-1] - c_time[0])
+            if res: 
+                res['fps'] = fps
+            # draw results
             if d.gui(res):
                 break
             # reset
