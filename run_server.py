@@ -9,16 +9,14 @@ import traceback
 
 
 dt = 0
-should_run = True
 
 def server_log(info):
     print "%s %s" % (datetime.datetime.now().strftime('%M:%S.%f'), info)
 
 def watchdog(c, const):
     global dt
-    global should_run
     has_stop = False
-    while should_run:
+    while dt >= 0:
         if time.time() - dt > const['dog']:
             if not has_stop:
                 server_log('STOP')
@@ -84,8 +82,7 @@ def run_server():
         pass
     except : 
         traceback.print_exc()
-    global should_run
-    should_run = False
+    dt = -1
     t.join()
     sock.close()
     del c
