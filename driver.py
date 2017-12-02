@@ -46,11 +46,12 @@ class controller:
         self.__motorf.stop()
         self.__setServo(0)
         self.__servop.stop()
-        print "\nController End"
+        print "Controller End"
 
     def __setServo(self, ratio):
         # normalize ratio to [-1, 1]
         s = -min(max(float(ratio), -1), 1)
+        self.__conf['servo'] = s
         mid = self.__const['servo_mid']
         dc = mid
         if s < 0:
@@ -63,7 +64,9 @@ class controller:
     def __setMotor(self, speed):
         # print speed
         forward = (speed >= 0)
-        s = min(max(float(abs(speed)), 0), self.__const['motor_max']) * 100
+        s = min(max(float(abs(speed)), 0), self.__const['motor_max'])
+        self.__conf['motor'] = s if forward else -s
+        s *= 100
         if forward:
             self.__motorb.ChangeDutyCycle(0)
             self.__motorf.ChangeDutyCycle(s)
@@ -93,8 +96,8 @@ class controller:
             traceback.print_exc() 
             return 1
 
-    def reset(self):
-        self.parse(self.__conf)
+    def getStatus(self):
+        return json.dumps(self.__conf)
 
     def emergency(self):
         self.__motorf.ChangeDutyCycle(0)
