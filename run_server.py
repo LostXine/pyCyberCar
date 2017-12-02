@@ -3,7 +3,7 @@
 
 from config import *
 from driver import controller
-from wbsocket import *
+from websocket import *
 import socket, json, sys, time, datetime
 import threading
 import traceback
