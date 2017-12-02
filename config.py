@@ -6,7 +6,7 @@ import multiprocessing as mp
 def getDefaultConst():
     const = {
             'port': 61551,
-            'dog': 3,
+            'dog': 0.5,
 
             'cam_width':640,
             'cam_height':480,
