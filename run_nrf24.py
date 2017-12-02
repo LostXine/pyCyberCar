@@ -84,6 +84,12 @@ def run_nrf24():
 
     radio.printDetails()
     print "----------------NRF24 Start-----------------"
+    # check debug mode
+    debug = False
+    for i in sys.argv:
+        if i == '-d':
+            print "**********DEBUG MODE**********"
+            debug = True
     radio.startListening()
     t = threading.Thread(target=cal_speed)
     t.setDaemon(True)
@@ -96,6 +102,8 @@ def run_nrf24():
             recv_buffer = []
             radio.read(recv_buffer)
             byteNum += len(recv_buffer)
+            if debug:
+                print recv_buffer
             ct += 1
             if ct > 1:
                 ct = 0
