@@ -4,8 +4,6 @@
 from config import *
 from driver import driver
 from dip import *
-from picamera.array import PiRGBArray
-from picamera import PiCamera
 import cv2, sys, multiprocessing, time
 
 d = None
@@ -17,12 +15,6 @@ def frame_loop(image):
 def run_cybercar():
     print "==========CyberCar Start=========="
     const = getDefaultConst()
-    # init picamera
-    c = PiCamera()
-    c.resolution = (640, 480)
-    c.framerate = 20 
-    # prepare memery
-    raw = PiRGBArray(c, c.resolution)
 
     # check multiprocess mode
     mp = False
@@ -33,6 +25,8 @@ def run_cybercar():
             mp = True
         if i == '-fps' or i == '-f':
             fps = True
+    # init camera
+    cc = cv2.VideoCapture(0)
     # init car driver
     global d
     d = dip()
@@ -45,8 +39,8 @@ def run_cybercar():
         c_frame = 0
         c_time = [time.time()]
     try:
-        for frame in c.capture_continuous(raw, format='bgr', use_video_port=True):
-            image = frame.array 
+        while True:
+            ret, image = cc.read()
             res = {}
             if mp:
                 if len(result) >= const['processor']:
@@ -73,13 +67,13 @@ def run_cybercar():
             # draw results
             if d.gui(res):
                 break
-            # reset
-            raw.truncate(0)
     except KeyboardInterrupt:
         pass
     if mp:
         pool.close()
         pool.join()
+    cc.release()
+    cv2.destroyAllWindows()
     return 0
                
     
