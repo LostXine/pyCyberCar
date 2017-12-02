@@ -97,7 +97,9 @@ class controller:
             return 1
 
     def getStatus(self):
-        return json.dumps(self.__conf)
+        res = self.__conf
+        res['tmp'] = time.time()
+        return json.dumps(res)
 
     def emergency(self):
         self.__motorf.ChangeDutyCycle(0)
