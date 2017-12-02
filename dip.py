@@ -41,7 +41,7 @@ class dip:
             # show image
             cv2.imshow("Frame", img)
             # waitkey
-            key = cv2.waitKey(10) & 0xff
+            key = cv2.waitKey(1) & 0xff
             # return something not 0 to finish the code
             # check key
             if key == ord("q") or key == 27:

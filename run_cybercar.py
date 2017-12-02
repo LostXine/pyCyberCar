@@ -28,8 +28,9 @@ def run_cybercar():
     # init camera
     cc = cv2.VideoCapture(0)
     # set width and height
-    # cc.set(3, 1280)
-    # cc.set(4, 720)
+    cc.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, const['cam_width'])
+    cc.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, const['cam_height'])
+    cc.set(cv2.cv.CV_CAP_PROP_FPS, const['cam_fps'])
     # init car driver
     global d
     d = dip()

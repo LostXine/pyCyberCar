@@ -8,6 +8,10 @@ def getDefaultConst():
             'port': 61551,
             'dog': 3,
 
+            'cam_width':640,
+            'cam_height':480,
+            'cam_fps': 30,
+
             'motor_fpin': 16,
             'motor_bpin': 20,
             'motor_level': [0, 0.7, 0.8, 0.9, 0.95, 1.0],
