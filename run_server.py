@@ -9,14 +9,16 @@ import traceback
 
 
 dt = 0
+should_run = True
 
 def server_log(info):
     print "%s %s" % (datetime.datetime.now().strftime('%M:%S.%f'), info)
 
 def watchdog(c, const):
     global dt
+    global should_run
     has_stop = False
-    while True:
+    while should_run:
         if time.time() - dt > const['dog']:
             if not has_stop:
                 server_log('STOP')
@@ -25,7 +27,7 @@ def watchdog(c, const):
         elif has_stop:
             # dog refeed
             has_stop = False
-        time.sleep(1)
+        time.sleep(0.1)
 
 
 
@@ -62,7 +64,7 @@ def run_server():
     try:
         # setup watchdog
         t = threading.Thread(target=watchdog, args=(c, const,))
-        t.setDaemon(True)
+        
         t.start()
 
         sender = None
@@ -81,10 +83,13 @@ def run_server():
     except KeyboardInterrupt:
         pass
     except : 
-        traceback.print_exc()     
-    del t
+        traceback.print_exc()
+    global should_run
+    should_run = False
+    t.join()
     sock.close()
-    print "\n----------Server End----------"
+    del c
+    print "----------Server End----------"
 
 if __name__=='__main__':
     print "----------Cyber Car Server----------"

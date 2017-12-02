@@ -46,7 +46,7 @@ class controller:
         self.__motorf.stop()
         self.__setServo(0)
         self.__servop.stop()
-        print "Controller End"
+        print "\nController End"
 
     def __setServo(self, ratio):
         # normalize ratio to [-1, 1]

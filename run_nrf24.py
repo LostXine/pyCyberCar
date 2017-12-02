@@ -11,6 +11,7 @@ from driver import driver
 import traceback
 
 byteNum = 0
+should_run = True
 
 def rerun_nrf24():
     py = sys.executable
@@ -27,8 +28,9 @@ def cal_unit(byte):
 
 def cal_speed():
     global byteNum
+    global should_run
     timeInv = 0.5
-    while True:
+    while should_run:
         speed = byteNum / timeInv
         byteNum = 0      
         f = sys.stdout
@@ -94,7 +96,6 @@ def run_nrf24():
     radio.startListening()
     if not debug:
         t = threading.Thread(target=cal_speed)
-        t.setDaemon(True)
         t.start()
     try:
         ct = 0
@@ -117,6 +118,10 @@ def run_nrf24():
     except:
         traceback.print_exc()
         print "\n----------------NRF24 Interrupted-----------------"
+    if not debug:
+        global should_run
+        should_run = False
+        t.join()
     radio.stopListening()
     radio.end()
     del d
