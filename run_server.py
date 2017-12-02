@@ -79,15 +79,12 @@ def run_server():
                 # feed the watchdog
                 dt = time.time()
     except KeyboardInterrupt:
-        return 0
+        pass
     except : 
-        traceback.print_exc() 
-        return 2
-    finally:
-        del t
-        sock.close()
-        del c
-        print "\n----------Server End----------"
+        traceback.print_exc()     
+    del t
+    sock.close()
+    print "\n----------Server End----------"
 
 if __name__=='__main__':
     print "----------Cyber Car Server----------"

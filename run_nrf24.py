@@ -12,6 +12,10 @@ import traceback
 
 byteNum = 0
 
+def restart():
+    py = sys.executable
+    os.execl(py, py, *sys.argv)
+
 def cal_unit(byte):
     unitList = ["B","kB","MB","GB"]
     num = len(unitList)
@@ -95,7 +99,9 @@ def run_nrf24():
             ct += 1
             if ct > 1:
                 ct = 0
-                parse_nrf(recv_buffer, d)
+                if parse_nrf(recv_buffer, d):
+                    restart()
+                    break
     except KeyboardInterrupt:
         pass
     except:
