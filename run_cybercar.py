@@ -27,6 +27,9 @@ def run_cybercar():
             fps = True
     # init camera
     cc = cv2.VideoCapture(0)
+    # set width and height
+    # cc.set(3, 1280)
+    # cc.set(4, 720)
     # init car driver
     global d
     d = dip()
@@ -39,7 +42,8 @@ def run_cybercar():
         c_frame = 0
         c_time = [time.time()]
     try:
-        while True:
+        ret = cc.read()
+        while ret:
             ret, image = cc.read()
             res = {}
             if mp:
@@ -67,6 +71,8 @@ def run_cybercar():
             # draw results
             if d.gui(res):
                 break
+        else:
+            print "Capture failed."
     except KeyboardInterrupt:
         pass
     if mp:
