@@ -106,7 +106,10 @@
           servo_data.push([obj['tmp'], obj['servo']]);
           if (servo_data.length > serial_len){servo_data.shift()};
         };
-      };
+      }
+      else{
+        writeToScreen("config: " + info + '\n');
+      }
       updateChart();
     }
     //更新图表
@@ -160,7 +163,7 @@
     }
     
     function onMessage(evt){
-      writeToScreen("recv: " + evt.data + '\n');
+      //writeToScreen("recv: " + evt.data + '\n');
       parseInfo(evt.data)
     }
 

@@ -69,7 +69,6 @@ def parse_nrf(info, driver):
 
 def run_nrf24():
     d = driver()
-    global byteNum
     pipes = [0xf0, 0xf0, 0xf0, 0xf0, 0xe1]
     print "----------------NRF24 Init-----------------"
     radio = NRF24()
