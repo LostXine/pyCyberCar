@@ -58,7 +58,7 @@ python run_nrf24.py
 ### Developer
 * [Yue ZHOU](http://cvpr.sjtu.edu.cn/aboutme.aspx), A.P. Department of Automation, Shanghai Jiao Tong University.
 * [Xiang LI](http://xxli.me), MEng Department of Automation, Shanghai Jiao Tong University. 
-* Shuo Shan, MEng Department of Automation, Shanghai Jiao Tong University. 
+* Shuo SHAN, MEng Department of Automation, Shanghai Jiao Tong University. 
 
 ### Contact me
 * Email: lostxine@gmail.com
