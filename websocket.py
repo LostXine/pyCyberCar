@@ -3,15 +3,15 @@
 
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 from run_server import *
-import uuid, os
+import uuid
+import os
 
 clients = []
 
-def basic_info():
-    const = {
-        mac: uuid.UUID(int = uuid.getnode()).hex[-12:],
-        version: os.popen('git rev-parse --short HEAD').readlines()
-    }
+def get_car_info():
+    const = {}
+    const['version'] =  os.popen('git rev-parse --short HEAD').readline()[0:-1]
+    const['mac'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
     return unicode(json.dumps(const))
 
 
@@ -22,8 +22,8 @@ class wbsocket(WebSocket):
 
     def handleConnected(self):
         server_log("%s:%d connected" % (self.address[0], self.address[1]))
-        self.sendMessage(basic_info())
         clients.append(self)
+        self.sendMessage(get_car_info())
 
     def handleClose(self):
         clients.remove(self)
