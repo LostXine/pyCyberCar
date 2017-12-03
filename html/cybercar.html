@@ -62,24 +62,25 @@
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
+
+    motor_data = []
+    servo_data = []
     // 解析客户端发来的信息
     function parseInfo(info){
+      obj.parseJSON()
+      motor_data.push([obj['tmp'], obj['motor']])
+      servo_data.push([obj['tmp'], obj['servo']])
+      updateChart()
+    }
+    //更新图表
+    function updateChart(){
       myChart.setOption({
         series: [{
-          data: [
-          [0.25, 0.32],
-          [0.73, -0.6],
-          [0.94, 0.420]
-          ]
+          data: motor_data
         },
         {
-          data: [
-          [0.25, 0.12],
-          [0.73, -0.130],
-          [0.94, 0.120]
-          ]
-        }
-        ]
+          data: servo_data
+        }]
       });
     }
 
