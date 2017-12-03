@@ -3,14 +3,15 @@
 
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 from run_server import *
-from config import *
-import uuid
+import uuid, os
 
 clients = []
 
 def basic_info():
-    const = getDefaultConst()
-    const['mac'] = uuid.UUID(int = uuid.getnode()).hex[-12:]
+    const = {
+        mac: uuid.UUID(int = uuid.getnode()).hex[-12:],
+        version: os.popen('git rev-parse --short HEAD').readlines()
+    }
     return unicode(json.dumps(const))
 
 
