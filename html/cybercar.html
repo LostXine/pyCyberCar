@@ -26,50 +26,48 @@
         trigger: 'axis',
         alwaysShowContent: true,
         formatter: function (params){
-            tv = params[0].axisValue
-            function findValue(index, buf){
+          tv = params[0].axisValue
+          function findValue(index, buf){
                 //console.log(index)
                 for (var t = buf.length -1; t >= 0; t--){
-                    if (index == buf[t][0]){
-                        return buf[t][1]
-                    }
+                  if (index == buf[t][0]){return buf[t][1];}
                 }
                 return -6
-                }
-            time = new Date(tv * 1000);
-            function getTime(date, value){
+              }
+              time = new Date(tv * 1000);
+              function getTime(date, value){
                 p = String(value).split('.');
-                return "Time: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>Motor: " + findValue(value, motor_data) + "</br>Servo: " + findValue(value, servo_data)
+                return "时间: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>电机: " + findValue(value, motor_data) + "</br>舵机: " + findValue(value, servo_data)
+              }
+              return getTime(time, tv);
+            },
+            transitionDuration: 0.0,
+            position: ['70%', '17%'],
+            axisPointer: {
+              type: 'line'
             }
-            return getTime(time, tv);
-        },
-        transitionDuration: 0.0,
-        position: ['70%', '17%'],
-        axisPointer: {
-            type: 'line'
-        }
-      },
-      legend: {
-        data:[
-        {name:'电机'},
-        {name:'舵机'}
-        ]
-      },
-      xAxis: {
-        type: 'value',
-        name: '时间',
-        axisLabel: {show :false}
-      },
-      yAxis: {
-        min: -1,
-        max: 1,
-        interval: 0.25
-      },
-      series: [
-      {
-        name: '电机',
-        type: 'line',
-        showSymbol: false,
+          },
+          legend: {
+            data:[
+            {name:'电机'},
+            {name:'舵机'}
+            ]
+          },
+          xAxis: {
+            type: 'value',
+            name: '时间',
+            axisLabel: {show :false}
+          },
+          yAxis: {
+            min: -1,
+            max: 1,
+            interval: 0.25
+          },
+          series: [
+          {
+            name: '电机',
+            type: 'line',
+            showSymbol: false,
         //hoverAnimation: false,
         //label : {normal: {show: true}}
       },
@@ -85,38 +83,38 @@
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
     var mouse_out = true;
-    jQuery( function ($){
-    $("#main_chart").hover(function(){
+    jQuery(function ($){
+      $("#main_chart").hover(function(){
         mouse_out = false;
-    }, function(){
-        mouse_out = true}
-        )
+      }, function(){
+        mouse_out = true;
+      })
     })
 
-    serial_len = 200
-    motor_data = []
-    servo_data = []
+    serial_len = 200;
+    motor_data = [];
+    servo_data = [];
     // 解析客户端发来的信息
     function parseInfo(info){
       obj = JSON.parse(info)
       if ('tmp' in obj){
-          if ('motor' in obj){
-            motor_data.push([obj['tmp'], obj['motor']])
-            if (motor_data.length > serial_len){motor_data.shift()}
-          }
-          if ('servo' in obj){
-            servo_data.push([obj['tmp'], obj['servo']])
-            if (servo_data.length > serial_len){servo_data.shift()}
-          }
-      }
-      updateChart()
+        if ('motor' in obj) {
+          motor_data.push([obj['tmp'], obj['motor']]);
+          if (motor_data.length > serial_len){motor_data.shift()};
+        };
+        if ('servo' in obj) {
+          servo_data.push([obj['tmp'], obj['servo']]);
+          if (servo_data.length > serial_len){servo_data.shift()};
+        };
+      };
+      updateChart();
     }
     //更新图表
     function updateChart(){
       myChart.setOption({
         xAxis:{
-            min: motor_data[0][0],
-            max: motor_data[motor_data.length -1][0] + 3
+          min: motor_data[0][0],
+          max: motor_data[motor_data.length -1][0] + 3
         },
         series: [{
           data: motor_data
@@ -127,9 +125,9 @@
       });
       if (mouse_out){
         myChart.dispatchAction({
-            type: 'showTip',
-            seriesIndex: 0,
-            dataIndex: motor_data.length - 1 
+          type: 'showTip',
+          seriesIndex: 0,
+          dataIndex: motor_data.length - 1 
         })
       }
     }
@@ -180,7 +178,7 @@
 
     function writeToScreen(message){
       if (document.myform.outputtext.value.length > 2000)
-          document.myform.outputtext.value = document.myform.outputtext.value.substr(message.length)
+        document.myform.outputtext.value = document.myform.outputtext.value.substr(message.length)
       document.myform.outputtext.value += message
       document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
     }
