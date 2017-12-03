@@ -38,6 +38,7 @@ def run_server():
     print "----------Server Init----------"
     
     # set watchdog
+    global dt
     dt = time.time()
     print "Start at %s" % time.asctime(time.localtime(dt))
 
