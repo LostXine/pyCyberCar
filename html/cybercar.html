@@ -14,68 +14,6 @@
   <div id="main_chart" style="width: 600px;height:400px;"></div>
 
   <script language="javascript" type="text/javascript">
-    function init(){
-      document.myform.url.value = "ws://" + document.domain + ":8000/"
-      // document.myform.inputtext.value = "Hello World!"
-      document.myform.disconnectButton.disabled = true;
-      //doConnect()
-    }
-
-    function doConnect(){
-      websocket = new WebSocket(document.myform.url.value);
-      websocket.onopen = function(evt) { onOpen(evt) };
-      websocket.onclose = function(evt) { onClose(evt) };
-      websocket.onmessage = function(evt) { onMessage(evt) };
-      websocket.onerror = function(evt) { onError(evt) };
-    }
-
-    function onOpen(evt){
-      writeToScreen("connected\n");
-      document.myform.connectButton.disabled = true;
-      document.myform.disconnectButton.disabled = false;
-    }
-
-    function onClose(evt){
-      writeToScreen("disconnected\n");
-      document.myform.connectButton.disabled = false;
-      document.myform.disconnectButton.disabled = true;
-    }
-
-    function onMessage(evt){
-      writeToScreen("recv: " + evt.data + '\n');
-    }
-
-    function onError(evt){
-      writeToScreen('error: ' + evt.data + '\n');
-      websocket.close();
-      document.myform.connectButton.disabled = false;
-      document.myform.disconnectButton.disabled = true;
-    }
-
-    function doSend(message){
-      writeToScreen("sent: " + message + '\n'); 
-      websocket.send(message);
-    }
-
-    function writeToScreen(message){
-      document.myform.outputtext.value += message
-      document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
-    }
-
-    window.addEventListener("load", init, false);
-
-    function sendText(){
-      doSend( document.myform.inputtext.value );
-    }
-
-    function clearText(){
-      document.myform.outputtext.value = "";
-    }
-
-    function doDisconnect(){
-      websocket.close();
-    }
-
     // ECHART
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main_chart'));
@@ -121,8 +59,93 @@
       },
       ]
     };
+
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
+    // 解析客户端发来的信息
+    function parseInfo(info){
+      myChart.setOption({
+        series: [{
+          data: [
+          [0.25, 0.32],
+          [0.73, -0.6],
+          [0.94, 0.420]
+          ]
+        },
+        {
+          data: [
+          [0.25, 0.12],
+          [0.73, -0.130],
+          [0.94, 0.120]
+          ]
+        }
+        ]
+      });
+    }
+
+    function init(){
+      document.myform.url.value = "ws://" + document.domain + ":8000/"
+      // document.myform.inputtext.value = "Hello World!"
+      document.myform.disconnectButton.disabled = true;
+      //doConnect()
+    }
+
+    function doConnect(){
+      websocket = new WebSocket(document.myform.url.value);
+      websocket.onopen = function(evt) { onOpen(evt) };
+      websocket.onclose = function(evt) { onClose(evt) };
+      websocket.onmessage = function(evt) { onMessage(evt) };
+      websocket.onerror = function(evt) { onError(evt) };
+    }
+
+    function onOpen(evt){
+      writeToScreen("connected\n");
+      document.myform.connectButton.disabled = true;
+      document.myform.disconnectButton.disabled = false;
+    }
+
+    function onClose(evt){
+      writeToScreen("disconnected\n");
+      document.myform.connectButton.disabled = false;
+      document.myform.disconnectButton.disabled = true;
+    }
+
+    function onMessage(evt){
+      writeToScreen("recv: " + evt.data + '\n');
+      parseInfo(evt.data)
+    }
+
+    function onError(evt){
+      writeToScreen('error: ' + evt.data + '\n');
+      websocket.close();
+      document.myform.connectButton.disabled = false;
+      document.myform.disconnectButton.disabled = true;
+    }
+
+    function doSend(message){
+      writeToScreen("sent: " + message + '\n'); 
+      websocket.send(message);
+    }
+
+    function writeToScreen(message){
+      document.myform.outputtext.value += message
+      document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
+    }
+
+    window.addEventListener("load", init, false);
+
+    function sendText(){
+      doSend( document.myform.inputtext.value );
+    }
+
+    function clearText(){
+      document.myform.outputtext.value = "";
+    }
+
+    function doDisconnect(){
+      websocket.close();
+    }
+
   </script>
 
   <div id="output">
