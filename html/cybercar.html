@@ -5,233 +5,261 @@
   <meta charset="utf-8">
   <!-- 引入 ECharts 文件 -->
   <script src="echarts.common.min.js"></script>
+  <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-  <!-- HTML正文开始 -->
-  <h3>CyberCar Viewer</h3>
-
-  <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-  <div id="main_chart" style="width: 600px;height:400px;"></div>
   <script src="jquery-3.2.1.min.js"></script>
+  <script src="./bootstrap/js/bootstrap.min.js"></script>
+  <div class="container">
+    <div class="page-header"id="top" >
+      <h3>CyberCar Viewer</br>
+        <small>designed by CVPR lab</small>
+      </h3>
+    </div>
+    <div class="row">
+
+      <div class="col-md-8">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              数据显示
+            </h3>
+          </div>
+          <div class="panel-body">
+            <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+            <div id="main_chart" style="width: 100%;height:400px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- profile -->
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              连接控制
+            </h3>
+          </div>
+          <div class="panel-body">
+            <div id="output">
+              <form name="myform">
+                <p>
+                  <!--
+                    <input type="button" name=sendButton value="Send" onClick="sendText();">
+                  -->
+                  <h4>地址</h4>
+                  <input name="url" style="width:100%"></input></br>
+                  <input type="button" class="btn btn-danger" name=disconnectButton value="断开" onClick="doDisconnect();">
+                  <input type="button"  class="btn btn-success" name=connectButton value="连接" onClick="doConnect();"></br>
+                  <textarea name="info" rows= "2" style="width:100%" readonly="true"></textarea>
+                </p>
+                <p>
+                  <h4>日志</h4>
+                  <input type="button"  class="btn btn-warning" name=clearButton value="清空" onClick="clearText();"></br>
+                  <textarea name="outputtext" rows="8" style="width:100%"  readonly="true"></textarea>
+                </p>  
+                <!--  
+                  <p>
+                    <textarea name="inputtext" cols="50"></textarea>
+                  </p>
+                -->
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
   <script language="javascript" type="text/javascript">
-    // ECHART
-    // 基于准备好的dom，初始化echarts实例
-    var myChart = echarts.init(document.getElementById('main_chart'));
-    // 指定图表的配置项和数据
-    var option = {
-      title: {
-        text: 'CyberCar运行情况'
-      },
-      tooltip: {
-        trigger: 'axis',
-        alwaysShowContent: true,
-        formatter: function (params){
-          tv = params[0].axisValue
-          function findValue(index, buf){
-                //console.log(index)
-                for (var t = buf.length -1; t >= 0; t--){
-                  if (index == buf[t][0]){return buf[t][1];}
-                }
-                return -6
+      // ECHART
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById('main_chart'));
+      // 指定图表的配置项和数据
+      var option = {
+        title: {
+          text: 'CyberCar运行情况'
+        },
+        tooltip: {
+          trigger: 'axis',
+          alwaysShowContent: true,
+          formatter: function (params){
+            tv = params[0].axisValue
+            function findValue(index, buf){
+              //console.log(index)
+              for (var t = buf.length -1; t >= 0; t--){
+                if (index == buf[t][0]){return buf[t][1];}
               }
-              time = new Date(tv * 1000);
-              function getTime(date, value){
-                p = String(value).split('.');
-                return "时间: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>电机: " + findValue(value, motor_data) + "</br>舵机: " + findValue(value, servo_data)
-              }
-              return getTime(time, tv);
-            },
-            transitionDuration: 0.0,
-            position: ['70%', '17%'],
-            axisPointer: {
-              type: 'line'
+              return -6
             }
+            time = new Date(tv * 1000);
+            function getTime(date, value){
+              p = String(value).split('.');
+              return "时间: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>电机: " + findValue(value, motor_data) + "</br>舵机: " + findValue(value, servo_data)
+            }
+            return getTime(time, tv);
           },
-          legend: {
-            data:[
-            {name:'电机'},
-            {name:'舵机'}
-            ]
+          transitionDuration: 0.0,
+          position: ['70%', '17%'],
+          axisPointer: {
+            type: 'line'
+          }
+        },
+        xAxis: {
+          type: 'value',
+          name: '时间',
+          axisLabel: {show :false}
+        },
+        yAxis: {
+          min: -1,
+          max: 1,
+          interval: 0.25
+        },
+        series: [
+        {
+          name: '电机',
+          type: 'line',
+          showSymbol: false,
+            //hoverAnimation: false,
+            //label : {normal: {show: true}}
           },
-          xAxis: {
-            type: 'value',
-            name: '时间',
-            axisLabel: {show :false}
-          },
-          yAxis: {
-            min: -1,
-            max: 1,
-            interval: 0.25
-          },
-          series: [
           {
-            name: '电机',
+            name: '舵机',
             type: 'line',
             showSymbol: false,
-        //hoverAnimation: false,
-        //label : {normal: {show: true}}
-      },
-      {
-        name: '舵机',
-        type: 'line',
-        showSymbol: false,
-        //hoverAnimation: false
-      }
-      ]
-    };
-
-    // 使用刚指定的配置项和数据显示图表。
-    myChart.setOption(option);
-    var mouse_out = true;
-    jQuery(function ($){
-      $("#main_chart").hover(function(){
-        mouse_out = false;
-      }, function(){
-        mouse_out = true;
-      })
-    })
-
-    serial_len = 200;
-    motor_data = [];
-    servo_data = [];
-    // 解析客户端发来的信息
-    function parseInfo(info){
-      obj = JSON.parse(info)
-      if ('tmp' in obj){
-        if ('motor' in obj) {
-          motor_data.push([obj['tmp'], obj['motor']]);
-          if (motor_data.length > serial_len){motor_data.shift()};
+            //hoverAnimation: false
+          }
+          ]
         };
-        if ('servo' in obj) {
-          servo_data.push([obj['tmp'], obj['servo']]);
-          if (servo_data.length > serial_len){servo_data.shift()};
-        };
-      }
-      else if ('mac' in obj && 'version' in obj){
-          document.myform.info.value = "本机编号: " + obj['mac'] + "</br>软件版本: " + obj['version']
-      }
-      else{
-        writeToScreen("Response: " + info + '\n');
-      }
-      updateChart();
-    }
-    //更新图表
-    function updateChart(){
-      myChart.setOption({
-        xAxis:{
-          min: motor_data[0][0],
-          max: motor_data[motor_data.length -1][0] + 3
-        },
-        series: [{
-          data: motor_data
-        },
-        {
-          data: servo_data
-        }]
-      });
-      if (mouse_out){
-        myChart.dispatchAction({
-          type: 'showTip',
-          seriesIndex: 0,
-          dataIndex: motor_data.length - 1 
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        var mouse_out = true;
+        jQuery(function ($){
+          $("#main_chart").hover(function(){
+            mouse_out = false;
+          }, function(){
+            mouse_out = true;
+          })
         })
-      }
-    }
+        window.onresize = function(){
+          myChart.resize()
+        }
 
-    function init(){
-      document.myform.url.value = "ws://" + document.domain + ":8000/"
-      // document.myform.inputtext.value = "Hello World!"
-      document.myform.disconnectButton.disabled = true;
-      doConnect()
-    }
+        serial_len = 200;
+        motor_data = [];
+        servo_data = [];
+        // 解析客户端发来的信息
+        function parseInfo(info){
+          obj = JSON.parse(info)
+          if ('tmp' in obj){
+            if ('motor' in obj) {
+              motor_data.push([obj['tmp'], obj['motor']]);
+              if (motor_data.length > serial_len){motor_data.shift()};
+            };
+            if ('servo' in obj) {
+              servo_data.push([obj['tmp'], obj['servo']]);
+              if (servo_data.length > serial_len){servo_data.shift()};
+            };
+            updateChart();
+          }
+          else if ('mac' in obj && 'version' in obj){
+            document.myform.info.value = "本机编号: " + obj['mac'] + "\r\n软件版本: " + obj['version']
+          }
+          else{
+            writeToScreen("Response: " + info + '\n');
+          }
+        }
+        //更新图表
+        function updateChart(){
+          myChart.setOption({
+            xAxis:{
+              min: motor_data[0][0],
+              max: motor_data[motor_data.length -1][0] + 3
+            },
+            series: [{
+              data: motor_data
+            },
+            {
+              data: servo_data
+            }]
+          });
+          if (mouse_out){
+            myChart.dispatchAction({
+              type: 'showTip',
+              seriesIndex: 0,
+              dataIndex: motor_data.length - 1 
+            })
+          }
+        }
 
-    function doConnect(){
-      websocket = new WebSocket(document.myform.url.value);
-      websocket.onopen = function(evt) { onOpen(evt) };
-      websocket.onclose = function(evt) { onClose(evt) };
-      websocket.onmessage = function(evt) { onMessage(evt) };
-      websocket.onerror = function(evt) { onError(evt) };
-    }
+        function init(){
+          document.myform.url.value = "ws://" + document.domain + ":8000/"
+          // document.myform.inputtext.value = "Hello World!"
+          document.myform.disconnectButton.disabled = true;
+          doConnect()
+        }
 
-    function onOpen(evt){
-      writeToScreen("connected\n");
-      document.myform.connectButton.disabled = true;
-      document.myform.disconnectButton.disabled = false;
-    }
+        function doConnect(){
+          websocket = new WebSocket(document.myform.url.value);
+          websocket.onopen = function(evt) { onOpen(evt) };
+          websocket.onclose = function(evt) { onClose(evt) };
+          websocket.onmessage = function(evt) { onMessage(evt) };
+          websocket.onerror = function(evt) { onError(evt) };
+        }
 
-    function onClose(evt){
-      writeToScreen("disconnected\n");
-      document.myform.connectButton.disabled = false;
-      document.myform.disconnectButton.disabled = true;
-    }
-    
-    function onMessage(evt){
-      //writeToScreen("recv: " + evt.data + '\n');
-      parseInfo(evt.data)
-    }
+        function onOpen(evt){
+          writeToScreen("connected\n");
+          document.myform.connectButton.disabled = true;
+          document.myform.disconnectButton.disabled = false;
+        }
 
-    function onError(evt){
-      writeToScreen('error: ' + evt.data + '\n');
-      websocket.close();
-      document.myform.connectButton.disabled = false;
-      document.myform.disconnectButton.disabled = true;
-    }
+        function onClose(evt){
+          writeToScreen("disconnected\n");
+          document.myform.connectButton.disabled = false;
+          document.myform.disconnectButton.disabled = true;
+        }
 
-    function doSend(message){
-      writeToScreen("sent: " + message + '\n'); 
-      websocket.send(message);
-    }
+        function onMessage(evt){
+          //writeToScreen("recv: " + evt.data + '\n');
+          parseInfo(evt.data)
+        }
 
-    function writeToScreen(message){
-      if (document.myform.outputtext.value.length > 2000)
-        document.myform.outputtext.value = document.myform.outputtext.value.substr(message.length)
-      document.myform.outputtext.value += message
-      document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
-    }
+        function onError(evt){
+          writeToScreen('error: ' + evt.data + '\n');
+          websocket.close();
+          document.myform.connectButton.disabled = false;
+          document.myform.disconnectButton.disabled = true;
+        }
 
-    window.addEventListener("load", init, false);
+        function doSend(message){
+          writeToScreen("sent: " + message + '\n'); 
+          websocket.send(message);
+        }
 
-    function sendText(){
-      doSend( document.myform.inputtext.value );
-    }
+        function writeToScreen(message){
+          if (document.myform.outputtext.value.length > 2000)
+            document.myform.outputtext.value = document.myform.outputtext.value.substr(message.length)
+          document.myform.outputtext.value += message
+          document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
+        }
 
-    function clearText(){
-      document.myform.outputtext.value = "";
-    }
+        window.addEventListener("load", init, false);
 
-    function doDisconnect(){
-      websocket.close();
-    }
+        function sendText(){
+          doSend( document.myform.inputtext.value );
+        }
 
-  </script>
+        function clearText(){
+          document.myform.outputtext.value = "";
+        }
 
-  <div id="output">
-    <h4>连接区域</h4>
-    <form name="myform">
-      <p>
-        <!--
-          <input type="button" name=sendButton value="Send" onClick="sendText();">
-        -->
-        <input type="button" name=clearButton value="清空" onClick="clearText();">
-        <input type="button" name=disconnectButton value="断开" onClick="doDisconnect();">
-        <input type="button" name=connectButton value="连接" onClick="doConnect();">
-        <h5>信息</h5>
-        <textarea name="info" rows= "2" cols="50" readonly="true"></textarea>
-        <h5>地址</h5>
-        <textarea name="url" rows= "3" cols="50"></textarea>
-      </p>
-      <p>
-        <h5>日志</h5>
-        <textarea name="outputtext" rows="20" cols="50"></textarea>
-      </p>  
-      <!--  
-        <p>
-          <textarea name="inputtext" cols="50"></textarea>
-        </p>
-      -->
-    </form>
-  </div>
+        function doDisconnect(){
+          websocket.close();
+        }
 
-</body>
-</html> 
+      </script>
+
+    </body>
+    </html> 
 
