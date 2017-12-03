@@ -26,15 +26,22 @@
         trigger: 'axis',
         alwaysShowContent: true,
         formatter: function (params){
-            mt = params[0];
-            sv = params[1];
-            console.log(params);
-            time = new Date(mt['data'][0] * 1000);
+            tv = params[0].axisValue
+            function findValue(index, buf){
+                //console.log(index)
+                for (var t = buf.length -1; t >= 0; t--){
+                    if (index == buf[t][0]){
+                        return buf[t][1]
+                    }
+                }
+                return -6
+                }
+            time = new Date(tv * 1000);
             function getTime(date, value){
                 p = String(value).split('.');
-                return "Time: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>Motor: " + mt['data'][1] + "</br>Servo: " + sv['data'][1]
+                return "Time: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>Motor: " + findValue(value, motor_data) + "</br>Servo: " + findValue(value, servo_data)
             }
-            return getTime(time, mt['data'][0]);
+            return getTime(time, tv);
         },
         transitionDuration: 0.0,
         position: ['70%', '17%'],
@@ -83,11 +90,17 @@
     // 解析客户端发来的信息
     function parseInfo(info){
       obj = JSON.parse(info)
-      motor_data.push([obj['tmp'], obj['motor']])
-      servo_data.push([obj['tmp'], obj['servo']])
-      if (motor_data.length > serial_len){motor_data.shift()}
-      if (servo_data.length > serial_len){servo_data.shift()}
-      updateChart()
+      if ('tmp' in obj){
+          if ('motor' in obj){
+            motor_data.push([obj['tmp'], obj['motor']])
+            if (motor_data.length > serial_len){motor_data.shift()}
+          }
+          if ('servo' in obj){
+            servo_data.push([obj['tmp'], obj['servo']])
+            if (servo_data.length > serial_len){servo_data.shift()}
+          }
+        updateChart()
+      }
     }
     //更新图表
     function updateChart(){
@@ -106,7 +119,7 @@
       myChart.dispatchAction({
         type: 'showTip',
         seriesIndex: 0,
-        dataIndex: motor_data.length - 1
+        dataIndex: motor_data.length - 1 
     })
     }
 
