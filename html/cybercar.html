@@ -12,7 +12,7 @@
 
   <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
   <div id="main_chart" style="width: 600px;height:400px;"></div>
-
+  <script src="jquery-3.2.1.min.js"></script>
   <script language="javascript" type="text/javascript">
     // ECHART
     // 基于准备好的dom，初始化echarts实例
@@ -84,6 +84,15 @@
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
+    var mouse_out = true;
+    jQuery( function ($){
+    $("#main_chart").hover(function(){
+        mouse_out = false;
+    }, function(){
+        mouse_out = true}
+        )
+    })
+
     serial_len = 200
     motor_data = []
     servo_data = []
@@ -99,8 +108,8 @@
             servo_data.push([obj['tmp'], obj['servo']])
             if (servo_data.length > serial_len){servo_data.shift()}
           }
-        updateChart()
       }
+      updateChart()
     }
     //更新图表
     function updateChart(){
@@ -116,11 +125,13 @@
           data: servo_data
         }]
       });
-      myChart.dispatchAction({
-        type: 'showTip',
-        seriesIndex: 0,
-        dataIndex: motor_data.length - 1 
-    })
+      if (mouse_out){
+        myChart.dispatchAction({
+            type: 'showTip',
+            seriesIndex: 0,
+            dataIndex: motor_data.length - 1 
+        })
+      }
     }
 
     function init(){
