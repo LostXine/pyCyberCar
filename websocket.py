@@ -19,6 +19,10 @@ class wbsocket(WebSocket):
         clients.remove(self)
         server_log("%s:%d closed" % (self.address[0], self.address[1]))
 
+def websock_send(info):
+    for client in clients:
+            client.sendMessage(unicode(info))
+
 def websocket_syn():
     server = SimpleWebSocketServer('', 8000, wbsocket)
     print "WebSocketServer Online"

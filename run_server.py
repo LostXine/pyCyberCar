@@ -20,8 +20,6 @@ def websock_loop(wb):
     wb.close()
 
 def watchdog(c, const):
-    global dt
-    global clients
     has_stop = False
     while dt >= 0:
         if time.time() - dt > const['dog']:
@@ -33,15 +31,13 @@ def watchdog(c, const):
             # dog refeed
             has_stop = False
         # update web socket info
-        for client in clients:
-            client.sendMessage(unicode(c.getStatus()))
+        websock_send(c.getStatus())
         time.sleep(0.05)
 
 def run_server():
     print "----------Server Init----------"
     
     # set watchdog
-    global dt
     dt = time.time()
     print "Start at %s" % time.asctime(time.localtime(dt))
 
