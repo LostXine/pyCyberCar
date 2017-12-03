@@ -28,8 +28,8 @@
           </div>
           <div class="panel-body">
             <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-            <div id="motor_chart" style="width: 100%;height:250px;" class="chart"></div>
-            <div id="servo_chart" style="width: 100%;height:250px;" class="chart"></div>
+            <div id="motor_chart" style="width: 100%;height:250px;"></div>
+            <div id="servo_chart" style="width: 100%;height:250px;"></div>
           </div>
         </div>
       </div>
@@ -123,7 +123,7 @@
           name: '电机',
           type: 'line',
           showSymbol: false,
-            //hoverAnimation: false,
+          hoverAnimation: false,
             //label : {normal: {show: true}}
           }
           ]
@@ -149,12 +149,18 @@
           text: '舵机'
         },
         servo_chart.setOption(option);
-        var mouse_out = true;
+        var mouse_out_motor = true;
+        var mouse_out_servo = true;
         jQuery(function ($){
-          $(".chart").hover(function(){
-            mouse_out = false;
+          $("#motor_chart").hover(function(){
+            mouse_out_motor = false;
           }, function(){
-            mouse_out = true;
+            mouse_out_motor = true;
+          });
+          $("#servo_chart").hover(function(){
+            mouse_out_servo = false;
+          }, function(){
+            mouse_out_servo = true;
           })
         })
         window.onresize = function(){
@@ -208,12 +214,14 @@
               data: servo_data
             }]
           });
-          if (mouse_out){
+          if (mouse_out_motor){
             motor_chart.dispatchAction({
               type: 'showTip',
               seriesIndex: 0,
               dataIndex: motor_data.length - 1 
             })
+          }
+          if (mouse_out_servo){
             servo_chart.dispatchAction({
               type: 'showTip',
               seriesIndex: 0,
