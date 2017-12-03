@@ -76,8 +76,8 @@
   <script language="javascript" type="text/javascript">
       // ECHART
       // 基于准备好的dom，初始化echarts实例
-      var motor_chart = echarts.init(document.getElementById('motor_chart'));
-      var servo_chart = echarts.init(document.getElementById('servo_chart'));
+      var motor_chart = echarts.init(document.getElementById('motor_chart'), 'shine');
+      var servo_chart = echarts.init(document.getElementById('servo_chart'), 'shine');
       // 指定图表的配置项和数据
       var option = {
         title: {
@@ -137,8 +137,9 @@
           showSymbol: false,
           itemStyle: {
             normal : {  
+              color:'#e6b600', 
               lineStyle:{  
-                color:'#00FF00'  
+                color:'#e6b600'  
               }  
             }  
           }
