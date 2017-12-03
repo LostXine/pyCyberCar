@@ -107,8 +107,11 @@
           if (servo_data.length > serial_len){servo_data.shift()};
         };
       }
+      else if ('mac' in obj && 'version' in obj){
+          document.myform.info.value = "本机编号: " + obj['mac'] + "</br>软件版本: " + obj['version']
+      }
       else{
-        writeToScreen("config: " + info + '\n');
+        writeToScreen("Response: " + info + '\n');
       }
       updateChart();
     }
@@ -206,11 +209,19 @@
     <h4>连接区域</h4>
     <form name="myform">
       <p>
-        <div>地址</div>
+        <!--
+          <input type="button" name=sendButton value="Send" onClick="sendText();">
+        -->
+        <input type="button" name=clearButton value="清空" onClick="clearText();">
+        <input type="button" name=disconnectButton value="断开" onClick="doDisconnect();">
+        <input type="button" name=connectButton value="连接" onClick="doConnect();">
+        <h5>信息</h5>
+        <textarea name="info" rows= "2" cols="50" readonly="true"></textarea>
+        <h5>地址</h5>
         <textarea name="url" rows= "3" cols="50"></textarea>
       </p>
       <p>
-        <div>日志</div>
+        <h5>日志</h5>
         <textarea name="outputtext" rows="20" cols="50"></textarea>
       </p>  
       <!--  
@@ -218,15 +229,6 @@
           <textarea name="inputtext" cols="50"></textarea>
         </p>
       -->
-      
-      <p>
-        <!--
-          <input type="button" name=sendButton value="Send" onClick="sendText();">
-        -->
-        <input type="button" name=clearButton value="清空" onClick="clearText();">
-        <input type="button" name=disconnectButton value="断开" onClick="doDisconnect();">
-        <input type="button" name=connectButton value="连接" onClick="doConnect();">
-      </p>
     </form>
   </div>
 
