@@ -50,15 +50,19 @@
                     <input type="button" name=sendButton value="Send" onClick="sendText();">
                   -->
                   <h4>地址</h4>
-                  <input name="url" style="width:100%"></input></br>
-                  <input type="button" class="btn btn-danger" name=disconnectButton value="断开" onClick="doDisconnect();">
-                  <input type="button"  class="btn btn-success" name=connectButton value="连接" onClick="doConnect();"></br>
-                  <textarea name="info" rows= "2" style="width:100%" readonly="true"></textarea>
+                  <textarea name="info" rows= "2" class="form-control"></textarea>
+                  <input name="url" class="form-control" style="width:100%"></input></br>
+                  <div>
+                    <input type="button" class="btn btn-danger" name=disconnectButton value="断开" onClick="doDisconnect();">
+                    <input type="button"  class="btn btn-success" name=connectButton value="连接" onClick="doConnect();">
+                  </div>
                 </p>
+                <hr>
                 <p>
                   <h4>日志</h4>
+                  <textarea name="outputtext" rows="8" class="form-control"></textarea>
+                  </br>
                   <input type="button"  class="btn btn-warning" name=clearButton value="清空" onClick="clearText();"></br>
-                  <textarea name="outputtext" rows="8" style="width:100%"  readonly="true"></textarea>
                 </p>  
                 <!--  
                   <p>
@@ -70,8 +74,13 @@
           </div>
         </div>
       </div>
-
-    </div>
+      </div>
+      <hr>
+      <div>
+          <p>
+            © CVPR 2017 <a href="https://github.com/LostXine/pyCyberCar">Github</a>
+          </p>
+      </div>
   </div>
   <script language="javascript" type="text/javascript">
       // ECHART
@@ -103,7 +112,7 @@
             return getTime(time, tv);
           },
           transitionDuration: 0.0,
-          position: ['70%', '17%'],
+          position: ['72%', '17%'],
           axisPointer: {
             type: 'line'
           }
@@ -142,8 +151,8 @@
                 color:'#e6b600'  
               }  
             }  
-          }
-          //hoverAnimation: false
+          },
+          hoverAnimation: false
         }];
         option ['title'] = {
           text: '舵机'
@@ -277,9 +286,10 @@
         function writeToScreen(message){
           if (document.myform.outputtext.value.length > 2000)
             document.myform.outputtext.value = document.myform.outputtext.value.substr(message.length)
-          document.myform.outputtext.value += message
+          document.myform.outputtext.value += ("[" + new Date().toLocaleTimeString() +"] " +  message)
           document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
         }
+
 
         window.addEventListener("load", init, false);
 
