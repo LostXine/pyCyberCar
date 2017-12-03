@@ -1,10 +1,10 @@
 # pyCyberCar
 
-CyberDIP driver for windows in C++ 11.
+CyberCar driver on Raspberry Pi 3 in Python 2.
 
-CyberDIP is a USB device clicking touchscreens of smartphones or pads under PC's control. 
-With the help of [grbl](https://github.com/grbl/grbl) running on an Arduino Nano, CyberDIP translates serial port signals from your PC into 2D-motion and clicks.
-Combined with computer vision, CyberDIP can play many games autonomously on almost any devices with a touchscreen.
+The project includes a driver for CyberCar and a visualization tool [cybercar.html](/html/cybercar.html).
+
+CyberCar is made from FREESCALE Type B. We use Raspberry Pi 3B+ as a controller. Then we added a CSI camera, a S-D5 servo motor, a 540 DC motor and other DC-DC modules. It can perform several image processing experiments and can work with many extensions.
 
 本工程包括使用python2编写的智能小车CyberCar驱动pyCyberCar以及配套的可视化网页[cybercar.html](/html/cybercar.html)。
 
