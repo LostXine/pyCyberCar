@@ -10,7 +10,7 @@
 <body>
   <script src="jquery-3.2.1.min.js"></script>
   <script src="./bootstrap/js/bootstrap.min.js"></script>
-  <script src=".shine.js"></script>
+  <script src="shine.js"></script>
   <div class="container">
     <div class="page-header"id="top" >
       <h3>CyberCar Viewer</br>
@@ -28,7 +28,8 @@
           </div>
           <div class="panel-body">
             <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-            <div id="main_chart" style="width: 100%;height:400px;"></div>
+            <div id="motor_chart" style="width: 100%;height:250px;" class="chart"></div>
+            <div id="servo_chart" style="width: 100%;height:250px;" class="chart"></div>
           </div>
         </div>
       </div>
@@ -75,11 +76,12 @@
   <script language="javascript" type="text/javascript">
       // ECHART
       // 基于准备好的dom，初始化echarts实例
-      var myChart = echarts.init(document.getElementById('main_chart'));
+      var motor_chart = echarts.init(document.getElementById('motor_chart'));
+      var servo_chart = echarts.init(document.getElementById('servo_chart'));
       // 指定图表的配置项和数据
       var option = {
         title: {
-          text: 'CyberCar运行情况'
+          text: 'CyberCar 电机情况'
         },
         tooltip: {
           trigger: 'axis',
@@ -123,28 +125,33 @@
           showSymbol: false,
             //hoverAnimation: false,
             //label : {normal: {show: true}}
-          },
-          {
-            name: '舵机',
-            type: 'line',
-            showSymbol: false,
-            //hoverAnimation: false
           }
           ]
         };
 
         // 使用刚指定的配置项和数据显示图表。
-        myChart.setOption(option);
+        motor_chart.setOption(option);
+        option['series'] = [{
+            name: '舵机',
+            type: 'line',
+            showSymbol: false,
+            //hoverAnimation: false
+          }];
+        option ['title'] = {
+          text: 'CyberCar 舵机情况'
+        },
+        servo_chart.setOption(option);
         var mouse_out = true;
         jQuery(function ($){
-          $("#main_chart").hover(function(){
+          $("chart").hover(function(){
             mouse_out = false;
           }, function(){
             mouse_out = true;
           })
         })
         window.onresize = function(){
-          myChart.resize()
+          motor_chart.resize()
+          servo_chart.resize()
         }
 
         serial_len = 200;
@@ -173,23 +180,36 @@
         }
         //更新图表
         function updateChart(){
-          myChart.setOption({
+          motor_chart.setOption({
             xAxis:{
               min: motor_data[0][0],
               max: motor_data[motor_data.length -1][0] + 3
             },
-            series: [{
-              data: motor_data
+            series: [
+            {
+              data: servo_data
+            }]
+          });
+          servo_chart.setOption({
+            xAxis:{
+              min: servo_data[0][0],
+              max: servo_data[servo_data.length -1][0] + 3
             },
+            series: [
             {
               data: servo_data
             }]
           });
           if (mouse_out){
-            myChart.dispatchAction({
+            motor_chart.dispatchAction({
               type: 'showTip',
               seriesIndex: 0,
               dataIndex: motor_data.length - 1 
+            })
+            servo_chart.dispatchAction({
+              type: 'showTip',
+              seriesIndex: 0,
+              dataIndex: servo_data.length - 1 
             })
           }
         }
