@@ -22,7 +22,23 @@
       title: {
         text: 'CyberCar运行情况'
       },
-      tooltip: {},
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params){
+            mt = params[0];
+            sv = params[1];
+            //console.log(params['data'][0]);
+            time = new Date(mt['data'][0] * 1000);
+            function getTime(date, value){
+                p = String(value).split('.');
+                return "Time:" + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "\r\nMotor: " + mt['data'][1] + "\r\nServo:" + sv['data'][1]
+            }
+            return getTime(time, mt['data'][0]);
+        },
+        axisPointer:{
+            animation: false
+        }
+      },
       legend: {
         data:[
         {name:'电机'},
@@ -42,39 +58,40 @@
       {
         name: '电机',
         type: 'line',
-        data: [
-        [0.25, 0.12],
-        [0.73, -0.130],
-        [0.94, 0.120]
-        ]
+        showSymbol: false,
+        hoverAnimation: false
       },
       {
         name: '舵机',
         type: 'line',
-        data: [
-        [0.25, 0.32],
-        [0.73, -0.6],
-        [0.94, 0.420]
-        ]
-      },
+        showSymbol: false,
+        hoverAnimation: false
+      }
       ]
     };
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
-
+    
+    serial_len = 200
     motor_data = []
     servo_data = []
     // 解析客户端发来的信息
     function parseInfo(info){
-      obj.parseJSON()
+      obj = JSON.parse(info)
       motor_data.push([obj['tmp'], obj['motor']])
       servo_data.push([obj['tmp'], obj['servo']])
+      if (motor_data.length > serial_len){motor_data.shift()}
+      if (servo_data.length > serial_len){servo_data.shift()}
       updateChart()
     }
     //更新图表
     function updateChart(){
       myChart.setOption({
+        xAxis:{
+            min: motor_data[0][0],
+            max: motor_data[motor_data.length -1][0] + 2
+        },
         series: [{
           data: motor_data
         },
@@ -88,7 +105,7 @@
       document.myform.url.value = "ws://" + document.domain + ":8000/"
       // document.myform.inputtext.value = "Hello World!"
       document.myform.disconnectButton.disabled = true;
-      //doConnect()
+      doConnect()
     }
 
     function doConnect(){

@@ -35,7 +35,7 @@ def watchdog(c, const):
         # update web socket info
         for client in clients:
             client.sendMessage(unicode(c.getStatus()))
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 def run_server():
     print "----------Server Init----------"
