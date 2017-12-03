@@ -24,19 +24,22 @@
       },
       tooltip: {
         trigger: 'axis',
+        alwaysShowContent: true,
         formatter: function (params){
             mt = params[0];
             sv = params[1];
-            //console.log(params['data'][0]);
+            console.log(params);
             time = new Date(mt['data'][0] * 1000);
             function getTime(date, value){
                 p = String(value).split('.');
-                return "Time:" + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "\r\nMotor: " + mt['data'][1] + "\r\nServo:" + sv['data'][1]
+                return "Time: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>Motor: " + mt['data'][1] + "</br>Servo: " + sv['data'][1]
             }
             return getTime(time, mt['data'][0]);
         },
-        axisPointer:{
-            animation: false
+        transitionDuration: 0.0,
+        position: ['70%', '17%'],
+        axisPointer: {
+            type: 'line'
         }
       },
       legend: {
@@ -47,7 +50,8 @@
       },
       xAxis: {
         type: 'value',
-        name: '时间'
+        name: '时间',
+        axisLabel: {show :false}
       },
       yAxis: {
         min: -1,
@@ -59,20 +63,20 @@
         name: '电机',
         type: 'line',
         showSymbol: false,
-        hoverAnimation: false
+        //hoverAnimation: false,
+        //label : {normal: {show: true}}
       },
       {
         name: '舵机',
         type: 'line',
         showSymbol: false,
-        hoverAnimation: false
+        //hoverAnimation: false
       }
       ]
     };
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
-    
     serial_len = 200
     motor_data = []
     servo_data = []
@@ -90,7 +94,7 @@
       myChart.setOption({
         xAxis:{
             min: motor_data[0][0],
-            max: motor_data[motor_data.length -1][0] + 2
+            max: motor_data[motor_data.length -1][0] + 3
         },
         series: [{
           data: motor_data
@@ -99,6 +103,11 @@
           data: servo_data
         }]
       });
+      myChart.dispatchAction({
+        type: 'showTip',
+        seriesIndex: 0,
+        dataIndex: motor_data.length - 1
+    })
     }
 
     function init(){
@@ -127,7 +136,7 @@
       document.myform.connectButton.disabled = false;
       document.myform.disconnectButton.disabled = true;
     }
-
+    
     function onMessage(evt){
       writeToScreen("recv: " + evt.data + '\n');
       parseInfo(evt.data)
@@ -146,6 +155,8 @@
     }
 
     function writeToScreen(message){
+      if (document.myform.outputtext.value.length > 2000)
+          document.myform.outputtext.value = document.myform.outputtext.value.substr(message.length)
       document.myform.outputtext.value += message
       document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
     }
