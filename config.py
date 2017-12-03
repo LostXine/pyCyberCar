@@ -6,7 +6,11 @@ import multiprocessing as mp
 def getDefaultConst():
     const = {
             'port': 61551,
-            'dog': 3,
+            'dog': 0.5,
+
+            'cam_width':640,
+            'cam_height':480,
+            'cam_fps': 30,
 
             'motor_fpin': 16,
             'motor_bpin': 20,
@@ -16,7 +20,7 @@ def getDefaultConst():
 
             'servo_pin': 21,
             'servo_left': 65.0,
-            'servo_mid': 48,
+            'servo_mid': 50,
             'servo_right': 35.0,
             'servo_feq': 300
             }

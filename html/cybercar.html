@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<title>CyberCar Viewer</title>
+<head>
+  <meta charset="utf-8">
+  <!-- 引入 ECharts 文件 -->
+  <script src="echarts.common.min.js"></script>
+  <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <script src="jquery-3.2.1.min.js"></script>
+  <script src="./bootstrap/js/bootstrap.min.js"></script>
+  <script src="shine.js"></script>
+  <div class="container">
+    <div class="page-header"id="top" >
+      <h3>CyberCar Viewer</br>
+        <small>designed by CVPR lab</small>
+      </h3>
+    </div>
+    <div class="row">
+
+      <div class="col-md-8">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              数据显示
+            </h3>
+          </div>
+          <div class="panel-body">
+            <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+            <div id="motor_chart" style="width: 100%;height:250px;"></div>
+            <div id="servo_chart" style="width: 100%;height:250px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- profile -->
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              连接控制
+            </h3>
+          </div>
+          <div class="panel-body">
+            <div id="output">
+              <form name="myform">
+                <p>
+                  <!--
+                    <input type="button" name=sendButton value="Send" onClick="sendText();">
+                  -->
+                  <h4>地址</h4>
+                  <textarea name="info" rows= "2" class="form-control"></textarea>
+                  <input name="url" class="form-control" style="width:100%"></input></br>
+                  <div>
+                    <input type="button" class="btn btn-danger" name=disconnectButton value="断开" onClick="doDisconnect();">
+                    <input type="button"  class="btn btn-success" name=connectButton value="连接" onClick="doConnect();">
+                  </div>
+                </p>
+                <hr>
+                <p>
+                  <h4>日志</h4>
+                  <textarea name="outputtext" rows="8" class="form-control"></textarea>
+                  </br>
+                  <input type="button"  class="btn btn-warning" name=clearButton value="清空" onClick="clearText();"></br>
+                </p>  
+                <!--  
+                  <p>
+                    <textarea name="inputtext" cols="50"></textarea>
+                  </p>
+                -->
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <hr>
+      <div>
+          <p>
+            © CVPR 2017 <a href="https://github.com/LostXine/pyCyberCar">Github</a>
+          </p>
+      </div>
+  </div>
+  <script language="javascript" type="text/javascript">
+      // ECHART
+      // 基于准备好的dom，初始化echarts实例
+      var motor_chart = echarts.init(document.getElementById('motor_chart'), 'shine');
+      var servo_chart = echarts.init(document.getElementById('servo_chart'), 'shine');
+      // 指定图表的配置项和数据
+      var option = {
+        title: {
+          text: '电机'
+        },
+        tooltip: {
+          trigger: 'axis',
+          alwaysShowContent: true,
+          formatter: function (params){
+            tv = params[0].axisValue
+            function findValue(index, buf){
+              //console.log(index)
+              for (var t = buf.length -1; t >= 0; t--){
+                if (index == buf[t][0]){return buf[t][1];}
+              }
+              return -6
+            }
+            time = new Date(tv * 1000);
+            function getTime(date, value){
+              p = String(value).split('.');
+              return "时间: " + date.getMinutes() + ':' + date.getSeconds() + '.' + p[1].substr(0,3) + "</br>电机: " + findValue(value, motor_data) + "</br>舵机: " + findValue(value, servo_data)
+            }
+            return getTime(time, tv);
+          },
+          transitionDuration: 0.0,
+          position: ['72%', '17%'],
+          axisPointer: {
+            type: 'line'
+          }
+        },
+        xAxis: {
+          type: 'value',
+          name: '时间',
+          axisLabel: {show :false}
+        },
+        yAxis: {
+          min: -1,
+          max: 1,
+          interval: 0.5
+        },
+        series: [
+        {
+          name: '电机',
+          type: 'line',
+          showSymbol: false,
+          hoverAnimation: false,
+            //label : {normal: {show: true}}
+          }
+          ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        motor_chart.setOption(option);
+        option['series'] = [{
+          name: '舵机',
+          type: 'line',
+          showSymbol: false,
+          itemStyle: {
+            normal : {  
+              color:'#e6b600', 
+              lineStyle:{  
+                color:'#e6b600'  
+              }  
+            }  
+          },
+          hoverAnimation: false
+        }];
+        option ['title'] = {
+          text: '舵机'
+        },
+        servo_chart.setOption(option);
+        var mouse_out_motor = true;
+        var mouse_out_servo = true;
+        jQuery(function ($){
+          $("#motor_chart").hover(function(){
+            mouse_out_motor = false;
+          }, function(){
+            mouse_out_motor = true;
+          });
+          $("#servo_chart").hover(function(){
+            mouse_out_servo = false;
+          }, function(){
+            mouse_out_servo = true;
+          })
+        })
+        window.onresize = function(){
+          motor_chart.resize()
+          servo_chart.resize()
+        }
+
+        serial_len = 200;
+        motor_data = [];
+        servo_data = [];
+        // 解析客户端发来的信息
+        function parseInfo(info){
+          obj = JSON.parse(info)
+          if ('tmp' in obj){
+            if ('motor' in obj) {
+              motor_data.push([obj['tmp'], obj['motor']]);
+              if (motor_data.length > serial_len){motor_data.shift()};
+            };
+            if ('servo' in obj) {
+              servo_data.push([obj['tmp'], obj['servo']]);
+              if (servo_data.length > serial_len){servo_data.shift()};
+            };
+            updateChart();
+          }
+          else if ('mac' in obj && 'version' in obj){
+            document.myform.info.value = "本机编号: " + obj['mac'] + "\r\n软件版本: " + obj['version']
+          }
+          else{
+            writeToScreen("Response: " + info + '\n');
+          }
+        }
+        //更新图表
+        function updateChart(){
+          motor_chart.setOption({
+            xAxis:{
+              min: motor_data[0][0],
+              max: motor_data[motor_data.length -1][0] + 3
+            },
+            series: [
+            {
+              data: servo_data
+            }]
+          });
+          servo_chart.setOption({
+            xAxis:{
+              min: servo_data[0][0],
+              max: servo_data[servo_data.length -1][0] + 3
+            },
+            series: [
+            {
+              data: servo_data
+            }]
+          });
+          if (mouse_out_motor){
+            motor_chart.dispatchAction({
+              type: 'showTip',
+              seriesIndex: 0,
+              dataIndex: motor_data.length - 1 
+            })
+          }
+          if (mouse_out_servo){
+            servo_chart.dispatchAction({
+              type: 'showTip',
+              seriesIndex: 0,
+              dataIndex: servo_data.length - 1 
+            })
+          }
+        }
+
+        function init(){
+          document.myform.url.value = "ws://" + document.domain + ":8000/"
+          // document.myform.inputtext.value = "Hello World!"
+          document.myform.disconnectButton.disabled = true;
+          doConnect()
+        }
+
+        function doConnect(){
+          websocket = new WebSocket(document.myform.url.value);
+          websocket.onopen = function(evt) { onOpen(evt) };
+          websocket.onclose = function(evt) { onClose(evt) };
+          websocket.onmessage = function(evt) { onMessage(evt) };
+          websocket.onerror = function(evt) { onError(evt) };
+        }
+
+        function onOpen(evt){
+          writeToScreen("connected\n");
+          document.myform.connectButton.disabled = true;
+          document.myform.disconnectButton.disabled = false;
+        }
+
+        function onClose(evt){
+          writeToScreen("disconnected\n");
+          document.myform.connectButton.disabled = false;
+          document.myform.disconnectButton.disabled = true;
+        }
+
+        function onMessage(evt){
+          //writeToScreen("recv: " + evt.data + '\n');
+          parseInfo(evt.data)
+        }
+
+        function onError(evt){
+          writeToScreen('error: ' + evt.data + '\n');
+          websocket.close();
+          document.myform.connectButton.disabled = false;
+          document.myform.disconnectButton.disabled = true;
+        }
+
+        function doSend(message){
+          writeToScreen("sent: " + message + '\n'); 
+          websocket.send(message);
+        }
+
+        function writeToScreen(message){
+          if (document.myform.outputtext.value.length > 2000)
+            document.myform.outputtext.value = document.myform.outputtext.value.substr(message.length)
+          document.myform.outputtext.value += ("[" + new Date().toLocaleTimeString() +"] " +  message)
+          document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
+        }
+
+
+        window.addEventListener("load", init, false);
+
+        function sendText(){
+          doSend( document.myform.inputtext.value );
+        }
+
+        function clearText(){
+          document.myform.outputtext.value = "";
+        }
+
+        function doDisconnect(){
+          websocket.close();
+        }
+
+      </script>
+
+    </body>
+    </html> 
+

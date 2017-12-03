@@ -6,11 +6,15 @@
 
 from nrf24 import NRF24
 import time
-import threading, sys
+import os,  sys, threading
 from driver import driver
 import traceback
 
 byteNum = 0
+
+def rerun_nrf24():
+    py = sys.executable
+    os.execl(py, py, *sys.argv)
 
 def cal_unit(byte):
     unitList = ["B","kB","MB","GB"]
@@ -24,7 +28,7 @@ def cal_unit(byte):
 def cal_speed():
     global byteNum
     timeInv = 0.5
-    while True:
+    while byteNum >= 0:
         speed = byteNum / timeInv
         byteNum = 0      
         f = sys.stdout
@@ -53,7 +57,7 @@ def parse_nrf(info, driver):
         #       % (parse_num(info[2:4]), parse_num(info[6:8]), parse_num(info[8:10]))
         motor_value = float(parse_num(info[2:4]))/1024
         # 0.0 - 1.0
-        if abs(motor_value) < 0.2:
+        if abs(motor_value) < 0.05:
             motor_value = 0
         servo_value = (float(parse_num(info[8:10]))/1024 - 0.5) * 2 
         driver.setStatus(time.time(), servo=servo_value, motor=motor_value /2)
@@ -65,7 +69,6 @@ def parse_nrf(info, driver):
 
 def run_nrf24():
     d = driver()
-    global byteNum
     pipes = [0xf0, 0xf0, 0xf0, 0xf0, 0xe1]
     print "----------------NRF24 Init-----------------"
     radio = NRF24()
@@ -80,10 +83,17 @@ def run_nrf24():
 
     radio.printDetails()
     print "----------------NRF24 Start-----------------"
+    # check debug mode
+    debug = False
+    restart = False
+    for i in sys.argv:
+        if i == '-d':
+            print "**********DEBUG MODE**********"
+            debug = True
     radio.startListening()
-    t = threading.Thread(target=cal_speed)
-    t.setDaemon(True)
-    t.start()
+    if not debug:
+        t = threading.Thread(target=cal_speed)
+        t.start()
     try:
         ct = 0
         while True:
@@ -92,20 +102,28 @@ def run_nrf24():
             recv_buffer = []
             radio.read(recv_buffer)
             byteNum += len(recv_buffer)
+            if debug:
+                print recv_buffer
             ct += 1
             if ct > 1:
                 ct = 0
-                parse_nrf(recv_buffer, d)
+                if parse_nrf(recv_buffer, d):
+                    restart = True
+                    break
     except KeyboardInterrupt:
         pass
     except:
         traceback.print_exc()
         print "\n----------------NRF24 Interrupted-----------------"
-    finally:
-        radio.stopListening()
-        radio.end()
-        del d
-        print "----------------NRF24 Ended-----------------"
+    if not debug:
+        byteNum = -1
+        t.join()
+    radio.stopListening()
+    radio.end()
+    del d
+    print "----------------NRF24 Ended-----------------"
+    if restart:
+        rerun_nrf24()
 
 if __name__=='__main__':
     run_nrf24()

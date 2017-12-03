@@ -3,6 +3,7 @@
 
 from config import *
 from driver import controller
+from websocket import *
 import socket, json, sys, time, datetime
 import threading
 import traceback
@@ -13,10 +14,14 @@ dt = 0
 def server_log(info):
     print "%s %s" % (datetime.datetime.now().strftime('%M:%S.%f'), info)
 
+def websock_loop(wb):
+    while dt >= 0:
+        wb.serveonce()
+    wb.close()
+
 def watchdog(c, const):
-    global dt
     has_stop = False
-    while True:
+    while dt >= 0:
         if time.time() - dt > const['dog']:
             if not has_stop:
                 server_log('STOP')
@@ -25,9 +30,9 @@ def watchdog(c, const):
         elif has_stop:
             # dog refeed
             has_stop = False
-        time.sleep(1)
-
-
+        # update web socket info
+        websock_send(c.getStatus())
+        time.sleep(0.05)
 
 def run_server():
     print "----------Server Init----------"
@@ -54,6 +59,10 @@ def run_server():
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(('127.0.0.1', const['port']))
         print "Listenning port:%d" % const['port']
+        # setup web socket
+        wbs = SimpleWebSocketServer('', 8000, wbsocket)
+        wb = threading.Thread(target=websock_loop, args=(wbs,))
+        wb.start()
     except:
         traceback.print_exc() 
         print "----------Server Init Failed----------"
@@ -62,7 +71,6 @@ def run_server():
     try:
         # setup watchdog
         t = threading.Thread(target=watchdog, args=(c, const,))
-        t.setDaemon(True)
         t.start()
 
         sender = None
@@ -79,15 +87,19 @@ def run_server():
                 # feed the watchdog
                 dt = time.time()
     except KeyboardInterrupt:
-        return 0
+        pass
     except : 
-        traceback.print_exc() 
-        return 2
-    finally:
-        del t
-        sock.close()
-        del c
-        print "\n----------Server End----------"
+        traceback.print_exc()
+    # clean watchdog 
+    dt = -1
+    t.join()
+    # clean web socket
+    wb.join()
+    # release udp port
+    sock.close()
+    # close car
+    del c
+    print "----------Server End----------"
 
 if __name__=='__main__':
     print "----------Cyber Car Server----------"
